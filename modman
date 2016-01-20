@@ -1,0 +1,9 @@
+app/code/community/Afterpay/Afterpay                        app/code/community/Afterpay/Afterpay
+app/design/adminhtml/default/default/layout/Afterpay        app/design/adminhtml/default/default/layout/Afterpay
+app/design/adminhtml/default/default/template/Afterpay      app/design/adminhtml/default/default/template/Afterpay
+app/design/frontend/base/default/layout/Afterpay            app/design/frontend/base/default/layout/Afterpay
+app/design/frontend/base/default/template/Afterpay          app/design/frontend/base/default/template/Afterpay
+app/etc/modules/Afterpay_Afterpay.xml                       app/etc/modules/Afterpay_Afterpay.xml
+app/locale/nl_NL/Afterpay_Afterpay.csv                      app/locale/nl_NL/Afterpay_Afterpay.csv
+app/locale/de_DE/Afterpay_Afterpay.csv                      app/locale/de_DE/Afterpay_Afterpay.csv
+skin/frontend/base/default/images/Afterpay                  skin/frontend/base/default/images/Afterpay

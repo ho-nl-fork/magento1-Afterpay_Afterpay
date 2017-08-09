@@ -1,6 +1,6 @@
 <?php 
 /**
- * Copyright (c) 2011-2015  arvato Finance B.V.
+ * Copyright (c) 2011-2017  arvato Finance B.V.
  *
  * AfterPay reserves all rights in the Program as delivered. The Program
  * or any portion thereof may not be reproduced in any form whatsoever without
@@ -18,7 +18,7 @@
  *
  * @category    AfterPay
  * @package     Afterpay_Afterpay
- * @copyright   Copyright (c) 2011-2015 arvato Finance B.V.
+ * @copyright   Copyright (c) 2011-2017 arvato Finance B.V.
  */
  
  class Afterpay_Afterpay_Model_Portfolios_Abstract extends Mage_Payment_Model_Method_Abstract
@@ -129,17 +129,37 @@
             return false;
         }
         
-        $mainConfigIpCheckEnabled = (bool) Mage::getStoreConfig('afterpay/afterpay_general/limit_by_ip', $storeId);
         $portfolioIpCheckEnabled  = (bool) Mage::getStoreConfig('afterpay/afterpay_' . $this->_code . '/limit_by_ip', $storeId);
-        $allowedIps               = array_map('trim', explode(',', Mage::getStoreConfig('dev/restrict/allow_ips', $storeId)));
+        $allowedIps               = array_map('trim', explode(',', Mage::getStoreConfig('afterpay/afterpay_' . $this->_code . '/limit_by_ip_ips', $storeId)));
+        $currentIp                = $_SERVER['REMOTE_ADDR'];
+        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $currentIp            = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        }
+        if (!empty($_SERVER['HTTP_X_REAL_IP'])) {
+            $currentIp            = $_SERVER['HTTP_X_REAL_IP'];
+        }
         
-        //checks if the IP-restriction option is enabled and if so, if the current user's IP is allowed
-        if (
-            ($mainConfigIpCheckEnabled || $portfolioIpCheckEnabled)
-             && !in_array($_SERVER['REMOTE_ADDR'], $allowedIps)
-            )
+        // If reversed iprestriction is filled with ip addresses then the payment method is not available for that ip adresses
+        $portfolioReversedIpCheckEnabled    = (bool) Mage::getStoreConfig('afterpay/afterpay_' . $this->_code . '/reversed_iprestriction', $storeId);
+        $disallowedIps                      = array_map('trim', explode(',', Mage::getStoreConfig('afterpay/afterpay_' . $this->_code . '/reversed_iprestriction_ips', $storeId)));
+        
+        if($portfolioReversedIpCheckEnabled)
         {
-            return false;
+            if (in_array($currentIp, $disallowedIps)) { return false; }
+        }
+        else 
+        {
+            //checks if the IP-restriction option is enabled and if so, if the current user's IP is allowed
+            if (
+                ($portfolioIpCheckEnabled)
+                 && (
+                    !in_array($currentIp, $allowedIps) 
+                    )
+                )
+            {
+                return false;
+            }
+        
         }
         
         $minAmountAllowed = (float) Mage::getStoreConfig('afterpay/afterpay_' . $this->_code . '/portfolio_min_amount', $storeId);
@@ -306,7 +326,7 @@
         if (!($data instanceof Varien_Object)) {
             $data = new Varien_Object($data);
         }
-        
+
         //changes the payment method code to camelCased to use with Magento's get method
         $codeString = 'get';
         $codeBits = explode('_', $this->_code);
@@ -314,18 +334,29 @@
             $codeString .= ucFirst($bit);
         }
         
+        // Check if date is in timestamp information
+        if(is_numeric($data->getDob()))
+        {
+            $timestamp = $data->getDob();
+            $data->setDob(gmdate("Y-m-d\TH:i:s", $timestamp));
+            $data->setYear(gmdate("Y", $timestamp));
+            $data->setMonth(gmdate("m", $timestamp));
+            $data->setDay(gmdate("d", $timestamp));
+        }
+
         //OSC compatibility
         if ($data->$codeString()) {
             $data = new Varien_Object($data->$codeString());
-            
             $infoArray = $this->_assignData($data);
         } else {
             $infoArray = $this->_assignData($data);
         }
-        
-        $info = $this->getInfoInstance();
-        $info->setAdditionalInformation($infoArray);
-        
+
+        if(strpos($this->_code, 'portfolio_') !== false)
+        {
+            $info = $this->getInfoInstance();
+            $info->setAdditionalInformation($infoArray);
+        }
         return $this;
     }
 
@@ -333,15 +364,14 @@
     {
         $infoArray = array(
             'gender'      => $data->getGender(),
+            'phonenumber' => $data->getPhonenumber(),
         );
         
         if (Mage::getStoreConfig('afterpay/afterpay_' . $this->_code . '/portfolio_type', Mage::app()->getStore()->getId()) == 'B2B') {
             $b2BInfoArray = array(
                 'coc'         => $data->getCoc(),
                 'companyname' => $data->getCompanyname(),
-                'department'  => $data->getDepartment(),
                 'vat'         => $data->getVat(),
-                'costcenter'  => $data->getCostcenter(),
             );
             $infoArray = array_merge($infoArray, $b2BInfoArray);
         } else {
@@ -350,7 +380,7 @@
                 'dob_year'    => $data->getYear(),
                 'dob_month'   => $data->getMonth(),
                 'dob_day'     => $data->getDay(),
-                'bankaccount' => $data->getBankaccount(),
+                'bankaccount' => $data->getBankaccount()
             );
             $infoArray = array_merge($infoArray, $b2CInfoArray);
         }

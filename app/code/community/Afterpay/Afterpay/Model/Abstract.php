@@ -1,6 +1,6 @@
 <?php 
 /**
- * Copyright (c) 2011-2015  arvato Finance B.V.
+ * Copyright (c) 2011-2017  arvato Finance B.V.
  *
  * AfterPay reserves all rights in the Program as delivered. The Program
  * or any portion thereof may not be reproduced in any form whatsoever without
@@ -18,7 +18,7 @@
  *
  * @category    AfterPay
  * @package     Afterpay_Afterpay
- * @copyright   Copyright (c) 2011-2015 arvato Finance B.V.
+ * @copyright   Copyright (c) 2011-2017 arvato Finance B.V.
  */
  
  class Afterpay_Afterpay_Model_Abstract extends Mage_Payment_Model_Method_Abstract
@@ -242,21 +242,66 @@
 
         // COMPATIBLE WITH PAAZL
         if (substr($method, 0, 16) == 'paazl_pakjegemak') {
-            $rate = Mage::getModel('sales/quote_address_rate')->load($this->_order->getShippingMethod(), 'code');            
+            $rate = Mage::getModel('sales/quote_address_rate')->load($this->_order->getShippingMethod(), 'code');
             $street = explode(" ", $rate->getServicePointAddress());
             $firstname = 'P';
             $lastname = 'Paazl Pakjegemak';
 
             if (count($street) > 0) {
                 $street_last = $street[count($street)-1];
-                $street_name = str_replace($street[count($street)-1], '', $rate->getServicePointAddress());                        
+                $street_name = str_replace($street[count($street)-1], '', $rate->getServicePointAddress());
                 $street_name = str_replace($street[count($street)-2], '', $street_name);
                 $street_add = $street_last;
                 $street_number = $street[count($street)-2];  
                 $street_name = preg_replace("/[\n\r]/","|",$street_name);
                 $address = $street_name . ' ' . $street_number . ' ' . $street_add;
             }
+        }
+        
+        // COMPATIBLE WITH POSTNL PAKJEGEMAK
+        if (Mage::helper('core')->isModuleEnabled('TIG_PostNL'))
+        {
+            $addresses = $this->_order->getAddressesCollection();
 
+            foreach ($addresses as $addressNew) {
+                if ($addressNew->getAddressType() == 'pakje_gemak' ) {
+                    $firstname = 'A';
+                    $lastname = 'POSTNL afhaalpunt ' . $addressNew->getCompany();
+                    $zip = $addressNew->getPostcode();
+                    $telephone = $addressNew->getTelephone();
+                    $countrycode = $addressNew->getCountryId();
+                    $street = $addressNew->getStreet();
+                    if(count($street) > 1) {
+                         $address = $street[0] . ' ' . $street[1];
+                    } else {
+                         $address = $street[0];
+                    }
+                }
+            }
+        }
+        
+        // COMPATIBLE WITH MYPARCEL PAKJEGEMAK
+        if (Mage::helper('core')->isModuleEnabled('TIG_MyParcel2014'))
+        {
+            // Myparcel saves the pickup location only on the quote address collection
+            $quote = Mage::getModel('sales/quote')->load($this->_order->getQuoteId());
+            $addresses = $quote->getAddressesCollection();
+
+            foreach ($addresses as $addressNew) {
+                if ($addressNew->getAddressType() == 'pakje_gemak' ) {
+                    $firstname = 'A';
+                    $lastname = 'POSTNL Afhaalpunt ' . $addressNew->getCompany();
+                    $zip = $addressNew->getPostcode();
+                    $telephone = $addressNew->getTelephone();
+                    $countrycode = $addressNew->getCountryId();
+                    $street = $addressNew->getStreet();
+                    if(count($street) > 1) {
+                         $address = $street[0] . ' ' . $street[1];
+                    } else {
+                         $address = $street[0];
+                    }
+                }
+            }
         }
 
         $shippingInfo = array(

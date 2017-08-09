@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011-2015  arvato Finance B.V.
+ * Copyright (c) 2011-2017  arvato Finance B.V.
  *
  * AfterPay reserves all rights in the Program as delivered. The Program
  * or any portion thereof may not be reproduced in any form whatsoever without
@@ -18,7 +18,7 @@
  *
  * @category    AfterPay
  * @package     Afterpay_Afterpay
- * @copyright   Copyright (c) 2011-2015 arvato Finance B.V.
+ * @copyright   Copyright (c) 2011-2017 arvato Finance B.V.
  */
  
  
@@ -138,7 +138,7 @@ class Afterpay_Afterpay_Model_Soap_Abstract extends Mage_Core_Model_Abstract
      * The method first attempts using a cached version of the WSDL. If that fails, it tries a non-cached version. If that also fails,
      * it will use a local version that is provided with this module
      */
-    protected function _getCorrectCLient($wsdlType)
+    protected function _getCorrectClient($wsdlType)
     {
         try {
             $client = $this->_getClient($wsdlType, WSDL_CACHE_DISK);

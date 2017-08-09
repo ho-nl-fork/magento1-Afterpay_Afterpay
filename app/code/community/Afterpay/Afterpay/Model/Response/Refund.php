@@ -1,6 +1,6 @@
 <?php 
 /**
- * Copyright (c) 2011-2015  arvato Finance B.V.
+ * Copyright (c) 2011-2017  arvato Finance B.V.
  *
  * AfterPay reserves all rights in the Program as delivered. The Program
  * or any portion thereof may not be reproduced in any form whatsoever without
@@ -18,7 +18,7 @@
  *
  * @category    AfterPay
  * @package     Afterpay_Afterpay
- * @copyright   Copyright (c) 2011-2015 arvato Finance B.V.
+ * @copyright   Copyright (c) 2011-2017 arvato Finance B.V.
  */
  
 class Afterpay_Afterpay_Model_Response_Refund extends Afterpay_Afterpay_Model_Response_Abstract
@@ -90,7 +90,8 @@ class Afterpay_Afterpay_Model_Response_Refund extends Afterpay_Afterpay_Model_Re
         }
         
         $checksum      = $this->_response->return->checksum;
-        $totalAmount   = $this->_response->return->totalInvoicedAmount;
+        $totalInvoicedAmount = $this->_response->return->totalInvoicedAmount;
+        $totalAmount   = (abs($totalInvoicedAmount) != $totalInvoicedAmount) ? 0 : $totalInvoicedAmount;
         $this->_totalInvoicedAmount = $totalAmount;
         $resultId      = $this->_response->return->resultId;
         $transactionId = $this->_response->return->transactionId;

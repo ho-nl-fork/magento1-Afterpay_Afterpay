@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011-2015  arvato Finance B.V.
+ * Copyright (c) 2011-2017  arvato Finance B.V.
  *
  * AfterPay reserves all rights in the Program as delivered. The Program
  * or any portion thereof may not be reproduced in any form whatsoever without
@@ -18,7 +18,7 @@
  *
  * @category    AfterPay
  * @package     Afterpay_Afterpay
- * @copyright   Copyright (c) 2011-2015 arvato Finance B.V.
+ * @copyright   Copyright (c) 2011-2017 arvato Finance B.V.
  */
  
 class Afterpay_Afterpay_Model_Request_Abstract extends Afterpay_Afterpay_Model_Abstract
@@ -325,7 +325,7 @@ class Afterpay_Afterpay_Model_Request_Abstract extends Afterpay_Afterpay_Model_A
         if ($orderDiff <> 0)
         {
             $orderlines[] = array(
-               'articleDescription' => 'BTW Afronding',
+               'articleDescription' => 'Correctie',
                'articleId'          => '1',
                'unitPrice'          => $orderDiff,
                'vatCategory'        => 1,
@@ -437,9 +437,7 @@ class Afterpay_Afterpay_Model_Request_Abstract extends Afterpay_Afterpay_Model_A
         $companyArray = array(
             'company' => array(
                 'cocNumber'   => $this->_additionalFields['coc'],
-                'companyName' => $this->_additionalFields['companyname'],
-                'department'  => $this->_additionalFields['department'],
-                'vatNumber'   => $this->_additionalFields['vat'],
+                'companyName' => $this->_additionalFields['companyname']
             ),
         );
         
@@ -455,11 +453,21 @@ class Afterpay_Afterpay_Model_Request_Abstract extends Afterpay_Afterpay_Model_A
 
     protected function _addB2CVariables()
     {
-        // Strip whitespace from bankaccount string
-        $bankAccountNumber = preg_replace( '/\s+/' , '' , $this->_additionalFields['bankaccount'] );
-        $array = array(
-            'bankAccountNumber' => $bankAccountNumber,
-        );
+        // Check if variable bankaccount is available
+        if(isset($this->_additionalFields['bankaccount']))
+        {
+            // Strip whitespace from bankaccount string
+            $bankAccountNumber = preg_replace( '/\s+/' , '' , $this->_additionalFields['bankaccount'] );
+            $array = array(
+                'bankAccountNumber' => $bankAccountNumber,
+            );
+        }
+        else
+        {
+            $array = array(
+                'bankAccountNumber' => '',
+            );
+        }
         
         if (is_array($this->_vars)) {
             $this->_vars = array_merge($this->_vars, $array);
@@ -472,18 +480,6 @@ class Afterpay_Afterpay_Model_Request_Abstract extends Afterpay_Afterpay_Model_A
     
     protected function _addPersonVariables($type = 'person')
     {
-        if (array_key_exists('doba', $this->_additionalFields)) {
-            $dobTimestamp = strtotime($this->_additionalFields['dob'], time());
-            $dob          = date('Y-m-d\TH:i:s', $dobTimestamp);
-        } elseif(array_key_exists('dob_year', $this->_additionalFields)) {
-            // Compatibility if javascript function for date does not work
-            $dobdate       = $this->_additionalFields['dob_year'] . '-' . $this->_additionalFields['dob_month'] . '-' . $this->_additionalFields['dob_day'];
-            $dobTimestamp = strtotime($dobdate, time());
-            $dob          = date('Y-m-d\TH:i:s', $dobTimestamp);
-        } else {
-            $dob = date('Y-m-d\TH:i:s', 0);
-        }
-        
         switch($type) {
             
             case 'shipping':   $email       = $this->_shippingInfo['email'];
@@ -502,12 +498,12 @@ class Afterpay_Afterpay_Model_Request_Abstract extends Afterpay_Afterpay_Model_A
         $array = array(
             $type => array(
                 'emailAddress'  => $email,
-                'gender'        => $this->_additionalFields['gender'],
+                'gender'        => $this->_getGender(),
                 'initials'      => $initials,
                 'isoLanguage'   => $this->_getIsoLanguage(),
                 'lastname'      => $lastname,
                 'phonenumber'   => $phoneNumber,
-                'dob'            => $dob,
+                'dob'           => ($this->_isB2B) ? '1970-01-01T00:00:00' : $this->_getDob()
             ),
         );
         
@@ -523,10 +519,6 @@ class Afterpay_Afterpay_Model_Request_Abstract extends Afterpay_Afterpay_Model_A
     protected function _getOrderLines()
     {
         $orderLines = array();
-        
-        if ($this->getIsB2B()) {
-            $orderLines[] = $this->_addB2BCostCenterLine();
-        }
 
         foreach ($this->_order->getAllItems() as $orderItem) 
         {
@@ -535,11 +527,18 @@ class Afterpay_Afterpay_Model_Request_Abstract extends Afterpay_Afterpay_Model_A
                 continue;
             }
             
-            $vatCategory = $this->_getTaxCategory($orderItem->product->getTaxClassId());
+            // Magento 1.6 does not have the function getProduct, to prevent errors load product on id
+            if (!is_object($orderItem->getProduct())) {
+                $product = Mage::getModel('catalog/product')->load($orderItem->getProductId());
+            } else {
+                $product = $orderItem->getProduct();
+            }
+          
+            $vatCategory = $this->_getTaxCategory($orderItem->getProduct()->getTaxClassId());
 
             // Determine specific settings for bundled products
             if($orderItem->getProductType() == 'bundle') {
-                $bundled = $orderItem->product;
+                $bundled = $product;
                 
                 // Check if price is dynamic or fixed 0 = dynamic and must show orderlines, 1 = fixed and only 1 orderline is shown
                 if($bundled->getPriceType() == 0) {
@@ -561,15 +560,22 @@ class Afterpay_Afterpay_Model_Request_Abstract extends Afterpay_Afterpay_Model_A
 
                     foreach($bundleitems['bundle_options'] as $item)
                     {
-                        $line = array(
-                            'articleDescription' => $item['value'][0]['qty'] . ' x ' . $orderItem->getName() . ': '. $item['value'][0]['title'],
-                            'articleId'          => $orderItem->getSku(),
-                            'unitPrice'          => round($orderItem->getQtyOrdered() * $item['value'][0]['price'] * 100,0),
-                            'vatCategory'        => $item['value'][0]['vatcategory'],
-                            'quantity'           => 1
-                        );
+                        if(isset($item['value'])) {
+                            foreach($item['value'] as $subitem) {
 
-                        $orderLines[] = $line;
+                                if(isset($subitem['price']) && floatval($subitem['price']) > 0)
+                                {
+                                    $line = array(
+                                        'articleDescription' => $subitem['qty'] . ' x ' . $orderItem->getName() . ': '. $subitem['title'],
+                                        'articleId'          => $orderItem->getSku(),
+                                        'unitPrice'          => round($subitem['qty'] * $subitem['price'] * 100,0),
+                                        'vatCategory'        => 1,
+                                        'quantity'           => 1
+                                    );
+                                    $orderLines[] = $line;
+                                }
+                            }
+                        }
                     }
 
                     continue;
@@ -656,20 +662,60 @@ class Afterpay_Afterpay_Model_Request_Abstract extends Afterpay_Afterpay_Model_A
     
     protected function _addPaymentFeeLine()
     {
-        $method = $this->_order->getPayment()->getMethod();
-        $paymentFee = Mage::getStoreConfig('afterpay/afterpay_' . $method . '/portfolio_payment_fee', $this->_order->getStoreId());
-        
-        if (!empty($paymentFee)) {
-            $paymentFeeLine = array(
-                'articleDescription' => 'Servicekosten AfterPay',
-                'articleId'          => 'FEE',
-                'unitPrice'          => round($paymentFee * 100, 0),
-                'vatCategory'        => $this->_getTaxCategory(Mage::getStoreConfig('afterpay/afterpay_tax/paymentfee_tax_class', $this->_order->getStoreId())),
-                'quantity'           => 1,
-            );
+        // Check if AfterPay Fee is used for service fee
+        if (Mage::helper('core')->isModuleEnabled('Afterpay_Afterpayfee'))
+        {
+            $paymentFee = (float) $this->_order->getAfterpayfeeAmount();
             
-            return $paymentFeeLine;
+            if (!empty($paymentFee)) {
+                $paymentFeeLine = array(
+                    'articleDescription' => Mage::getStoreConfig('afterpay/afterpay_afterpayfee/afterpayfee_label', $this->_order->getStoreId()),
+                    'articleId'          => 'FEE',
+                    'unitPrice'          => round($paymentFee * 100, 0),
+                    'vatCategory'        => 1,
+                    'quantity'           => 1,
+                );
+            
+                return $paymentFeeLine;
+            }
         }
+        
+        // Check if Fooman Surcharge is used for service fee
+        if (Mage::helper('core')->isModuleEnabled('Fooman_Surcharge'))
+        {
+            $paymentFee = $this->_order->getFoomanSurchargeAmount() + $this->_order->getFoomanSurchargeTaxAmount();
+            
+            if (!empty($paymentFee)) {
+                $paymentFeeLine = array(
+                    'articleDescription' => $this->_order->getFoomanSurchargeDescription(),
+                    'articleId'          => 'FEE',
+                    'unitPrice'          => round($paymentFee * 100, 0),
+                    'vatCategory'        => 1,
+                    'quantity'           => 1,
+                );
+            
+                return $paymentFeeLine;
+            }
+        }
+        
+        // Check if Mageworx Multifees is used for service fee
+        if (Mage::helper('core')->isModuleEnabled('MageWorx_MultiFees'))
+        {
+            $paymentFee = (float) ($this->_order->getMultifeesAmount());
+            
+            if (!empty($paymentFee)) {
+                $paymentFeeLine = array(
+                    'articleDescription' => 'Extra kosten',
+                    'articleId'          => 'FEE',
+                    'unitPrice'          => round($paymentFee * 100, 0),
+                    'vatCategory'        => 1,
+                    'quantity'           => 1,
+                );
+            
+                return $paymentFeeLine;
+            }
+        }
+        
         return false;
     }
 
@@ -760,7 +806,19 @@ class Afterpay_Afterpay_Model_Request_Abstract extends Afterpay_Afterpay_Model_A
 
     protected function _addStoreCreditsLine()
     {
+        // Check if there are Magento Enterprise Store Credits being used
         $storeCredits = (float) $this->_order->getBaseCustomerBalanceAmount();
+
+        // Check if there are Aheadworks Store Credits used
+        if (Mage::helper('core')->isModuleEnabled('AW_Storecredit') && is_array($this->_order->getAwStorecredit()))
+        {
+            $storeCredits = 0;
+            foreach($this->_order->getAwStorecredit() as $awStoreCredit)
+            {
+                $storeCredits += (float) $awStoreCredit->getStorecreditAmount();
+            }
+        }
+
         if (!empty($storeCredits)) {
             $storeCreditsLine = array(
                 'articleDescription' => 'Store Credits',
@@ -799,19 +857,6 @@ class Afterpay_Afterpay_Model_Request_Abstract extends Afterpay_Afterpay_Model_A
         }
         
         return false;
-    }
-    
-    protected function _addB2BCostCenterLine()
-    {
-        $costcenterLine = array (
-            'articleDescription' => 'Kostenplaats: ' . $this->_additionalFields['costcenter'],
-            'articleId'          => 'KOSTENPLAATS',
-            'unitPrice'          => 0,
-            'vatCategory'        => 4,
-            'quantity'           => 1,
-        );
-    
-        return $costcenterLine;
     }
     
     protected function _getTaxCategory($taxClassId)
@@ -881,10 +926,16 @@ class Afterpay_Afterpay_Model_Request_Abstract extends Afterpay_Afterpay_Model_A
     
     protected function _getPhoneNumber($type)
     {
-        if ($type == 'shipping') {
-            $number = $this->_shippingInfo['telephone'];
+        if ( isset( $this->_additionalFields['phonenumber'] ) )
+        {
+            $number = $this->_additionalFields['phonenumber'];
         } else {
-            $number = $this->_billingInfo['telephone'];
+        
+            if ($type == 'shipping') {
+                $number = $this->_shippingInfo['telephone'];
+            } else {
+                $number = $this->_billingInfo['telephone'];
+            }
         }
         
         //the final output must like this: 0031123456789 for mobile: 0031612345678
@@ -919,6 +970,81 @@ class Afterpay_Afterpay_Model_Request_Abstract extends Afterpay_Afterpay_Model_A
         }
         
         return $return;
+    }
+    
+    protected function _getGender()
+    {
+        $gender = 'V';
+        if ($this->_isB2B) {
+            $gender = '';
+        }
+        
+        if ( isset( $this->_additionalFields['gender'] ) )
+        {
+            $gender = $this->_additionalFields['gender'];
+        } elseif ($this->_order->getCustomerGender()) {
+            $magentoGender = $this->_order->getCustomerGender();
+            switch($magentoGender) {
+                case '1':
+                    $gender = 'M';
+                    break;
+                case '2':
+                    $gender = 'V';
+                    break;
+            }
+        } else {
+            $gender = '';
+        }
+        return $gender;
+    }
+    
+    protected function _getDob()
+    {
+        // Set variable for date of birth
+        $dob = '';
+        
+        // First check if form birthday is set else get the birthday of the customer, otherwise error
+        if ( isset( $this->_additionalFields['dob'] ) || isset( $this->_additionalFields['dob_year'] ) )
+        {
+            // Logics if javascript worked
+            if ( array_key_exists( 'dob', $this->_additionalFields ) )
+            {
+                $dobTimestamp = strtotime( $this->_additionalFields['dob'], time() );
+                $dob = date( 'Y-m-d\TH:i:s', $dobTimestamp );
+            }
+            // Logics if javascript for date has not worked
+            elseif ( 
+                array_key_exists( 'dob_year', $this->_additionalFields )
+                && array_key_exists( 'dob_month', $this->_additionalFields )
+                && array_key_exists( 'dob_day', $this->_additionalFields )
+            )
+            {
+                $dobdate = $this->_additionalFields['dob_year'] . '-' . $this->_additionalFields['dob_month'] . '-' . 
+                    $this->_additionalFields['dob_day'];
+                $dobTimestamp = strtotime($dobdate, time());
+                $dob = date('Y-m-d\TH:i:s', $dobTimestamp);
+            }
+        }
+        // No birthday sent through form fields, look if a birthday was sent using Magento default fields
+        elseif( $this->_order->getCustomerDob() )
+        {
+            $dobdate = $this->_order->getCustomerDob();
+            $dobTimestamp = strtotime( $dobdate, time() );
+            $dob = date('Y-m-d\TH:i:s', $dobTimestamp);
+        }
+        // If the variable $dob is not filled, then there was a problem with getting the correct date of birth
+        // Because sending an empty value will cause SOAP error, do Mage Exception instead
+        if ($dob == '')
+        {
+            // Cancel the order to prevent pending orders
+            $this->_order->cancel()->save();
+            // Restore the quote to keep cart information
+            $this->restoreQuote();
+            // Sent back error
+            Mage::throwException($this->_helper->__('The date of birth is missing invalid. Please check your date or birth or contact our customer service.'));
+        }
+        
+        return $dob;
     }
     
     protected function _isValidNotation($number) {

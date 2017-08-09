@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011-2015  arvato Finance B.V.
+ * Copyright (c) 2011-2017  arvato Finance B.V.
  *
  * AfterPay reserves all rights in the Program as delivered. The Program
  * or any portion thereof may not be reproduced in any form whatsoever without
@@ -18,7 +18,7 @@
  *
  * @category    AfterPay
  * @package     Afterpay_Afterpay
- * @copyright   Copyright (c) 2011-2015 arvato Finance B.V.
+ * @copyright   Copyright (c) 2011-2017 arvato Finance B.V.
  */
  
  class Afterpay_Afterpay_Block_Portfolios_Checkout_Form extends Mage_Payment_Block_Form
@@ -30,10 +30,21 @@
     public $privacyStatementUrl              = '<a href="http://www.afterpay.nl/page/privacy-statement" target="_blank">';
     public $consumerContactUrl               = '<a href="http://www.afterpay.nl/page/consument-contact" target="_blank">';
     public $consumerPageUrl                  = '<a href="http://www.afterpay.nl/page/consument" target="_blank">';
-    public $paymentConditionsUrl             = '<a href="http://www.afterpay.nl/page/consument-betalingsvoorwaarden" target="_blank">';
-    public $country                             = 'nlnl';
+    public $paymentConditionsUrl             = '<a href="http://www.afterpay.nl/page/consument-betalingsvoorwaarden" target="_blank" style="margin-top:0; float:none; margin-left:0">';
+    public $country                          = 'nlnl';
     
     protected $_template = 'Afterpay/Afterpay/portfolios/checkout/form.phtml';
+    
+    public function __construct()
+    {
+        parent::__construct();
+        
+        // If IWD or OSC is used then use different form template
+        if (Mage::helper('core')->isModuleEnabled('IWD_Opc') || Mage::helper('core')->isModuleEnabled('Idev_OneStepCheckout'))
+        {
+            $this->setTemplate('Afterpay/Afterpay/portfolios/checkout/form-iwd.phtml');
+        }
+    }
     
     public function setBlockData()
     {
@@ -90,6 +101,12 @@
                         . '\'>';$this->getMethod()->getFootnote() . '</span>';
         }
         
+        // If IWD is used then use no logo
+        if (Mage::helper('core')->isModuleEnabled('IWD_Opc') || Mage::helper('core')->isModuleEnabled('Idev_OneStepCheckout'))
+        {
+            $labelAfterHtml = $this->getMethod()->getTitle();
+        }
+        
         return $labelAfterHtml;
     }
     
@@ -114,6 +131,38 @@
     public function showBankaccount()
     {
         if (Mage::getStoreConfig('afterpay/afterpay_' . $this->getMethod()->getCode() . '/portfolio_showbankaccount') == '1') {
+            return true;
+        }
+        return false;
+    }
+    
+    public function showGender()
+    {
+        if (Mage::getStoreConfig('afterpay/afterpay_' . $this->getMethod()->getCode() . '/portfolio_showgender') == '1') {
+            return true;
+        }
+        return false;
+    }
+    
+    public function showPhonenumber()
+    {
+        if (Mage::getStoreConfig('afterpay/afterpay_' . $this->getMethod()->getCode() . '/portfolio_showphonenumber') == '1') {
+            return true;
+        }
+        return false;
+    }
+    
+    public function showDob()
+    {
+        if (Mage::getStoreConfig('afterpay/afterpay_' . $this->getMethod()->getCode() . '/portfolio_showdob') == '1') {
+            return true;
+        }
+        return false;
+    }
+    
+    public function showTerms()
+    {
+        if (Mage::getStoreConfig('afterpay/afterpay_' . $this->getMethod()->getCode() . '/portfolio_showterms') == '1') {
             return true;
         }
         return false;

@@ -37,17 +37,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                         </active>
-                        <limit_by_ip translate="label comment tooltip">
-                            <label>Client IP restriction</label>
-                            <comment>Use IP client restriction of Magento to show only for selected IP’s</comment>
-                            <tooltip>Magento gives developers the option to enter developers IP. AfterPay uses this list when enabled.</tooltip>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>30</sort_order> 
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </limit_by_ip>
                         <push_password translate="label comment">
                             <label>Push Password (only for Belgium)</label>
                             <comment>Your push password is provided by AfterPay.</comment>
@@ -75,7 +64,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </failure_redirect>
-                        <!--
                         <validation_redirect>
                             <label>Validation URL</label>
                             <comment>The page a customer is redirected to when an order is denied by validation error. Leave blank for default magento.</comment>
@@ -85,23 +73,45 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </validation_redirect>
-                        -->
                         <auto_invoice>
                             <label>Auto-Invoice</label>
-                            <comment>Select Yes to automatically invoice orders when they are accepted by AfterPay</comment>
+                            <comment>Select Yes to automatically invoice orders in Magento when they are accepted by AfterPay</comment>
                             <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>105</sort_order> 
+                            <source_model>afterpay/sources_autoinvoiceMode</source_model>
+                            <sort_order>104</sort_order> 
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                         </auto_invoice>
+                        <auto_invoice_status>
+                            <label>Auto invoice status</label>
+                            <comment>Select status on which the invoice must be created</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>afterpay/sources_autoinvoiceStatuses</source_model>
+                            <sort_order>105</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <auto_invoice>yes-status</auto_invoice>
+                            </depends>
+                        </auto_invoice_status>
+                        <send_invoice>
+                            <label>Send Invoice Mail</label>
+                            <comment>Select Yes to send Magento Invoice mail</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>106</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </send_invoice>
                         <separate_discount>
                             <label>Separate Discount</label>
                             <comment>Select Yes to sent the discount as separate order line to AfterPay</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>106</sort_order> 
+                            <sort_order>107</sort_order> 
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -176,18 +186,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                        </no> 
-                        <paymentfee_tax_class>
-                            <label>Tax class for Payment Fee</label>
-                            <comment>Select which tax class should be used for the Payment Fee</comment>
-                            <tooltip>Must be a 'high VAT' tax class</tooltip>
-                            <frontend_type>select</frontend_type>
-                            <source_model>afterpay/sources_taxClasses</source_model>
-                            <sort_order>50</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </paymentfee_tax_class>
+                        </no>
                         <discount_tax_class>
                             <label>Tax class for Discount</label>
                             <comment>Select which tax class should be used for the Discount</comment>
@@ -209,7 +208,7 @@
                     <show_in_store>1</show_in_store>
                     <fields>
                         <active translate="label comment tooltip">
-                            <label>Portfolio A enabled</label>
+                            <label>Portfolio enabled</label>
                             <comment>Select Yes to enable the portfolio.</comment>
                             <tooltip>To use the module it needs to be enabled. When No is selected the module isn’t shown on the front of the shop.</tooltip>
                             <frontend_type>select</frontend_type>
@@ -219,13 +218,63 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </active>
+                        <current_ip_address_for_restriction translate="label comment tooltip">
+                            <label>Your current IP Adresses</label>
+                            <frontend_model>afterpay/adminhtml_ipaddress</frontend_model>
+                            <sort_order>11</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </current_ip_address_for_restriction>
+                        <limit_by_ip translate="label comment tooltip">
+                            <label>Show payment method only for certain IP adresses</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>12</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </limit_by_ip>
+                        <limit_by_ip_ips translate="label comment tooltip">
+                            <label>IP Adresses</label>
+                            <comment>Use comma to seperate IP adresses</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>13</sort_order> 
+                            <depends>
+                                <limit_by_ip>1</limit_by_ip>
+                            </depends>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </limit_by_ip_ips>
+                        <reversed_iprestriction translate="label comment">
+                            <label>Hide payment method only for certain IP adresses</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>14</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </reversed_iprestriction>
+                        <reversed_iprestriction_ips translate="label comment">
+                            <label>IP Adresses</label>
+                            <comment>Use comma to seperate IP adresses</comment>
+                            <frontend_type>text</frontend_type>
+                            <depends>
+                                <reversed_iprestriction>1</reversed_iprestriction>
+                            </depends>
+                            <sort_order>15</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </reversed_iprestriction_ips>
                         <mode translate="label comment tooltip">
                             <label>Mode</label>
                             <comment>Select Live to preform live transactions.</comment>
                             <tooltip>When the base configuration is still in test mode. Live mode of the portfolio is overruled.</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>afterpay/sources_testLive</source_model>
-                            <sort_order>11</sort_order>
+                            <sort_order>17</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -235,7 +284,7 @@
                             <comment>Your user account is provided by AfterPay.</comment>
                             <tooltip>To get an account contact AfterPay.</tooltip>
                             <frontend_type>text</frontend_type>
-                            <sort_order>12</sort_order>
+                            <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -244,27 +293,16 @@
                             <label>Test merchantID</label>
                             <comment>Your user account is provided by AfterPay.</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>13</sort_order>
+                            <sort_order>25</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </test_merchant_id>
-                        <limit_by_ip translate="label comment tooltip">
-                            <label>Client IP restriction</label>
-                            <comment>Use IP client restriction of Magento to show only for selected IP’s</comment>
-                            <tooltip>Magento gives developers the option to enter developers IP. AfterPay uses this list when enabled.</tooltip>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>14</sort_order> 
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </limit_by_ip>
                         <portfolio_id>
-                            <label>Portfiolio ID</label>
+                            <label>Portfolio ID</label>
                             <comment>Afterpay will deliver a portfolio ID</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>15</sort_order>
+                            <sort_order>30</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -273,7 +311,7 @@
                             <label>Live Password</label>
                             <comment>Your Password is provided by AfterPay.</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>16</sort_order>
+                            <sort_order>35</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -282,13 +320,13 @@
                             <label>Test Password</label>
                             <comment>Your Password is provided by AfterPay.</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>17</sort_order>
+                            <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </test_password>
                         <portfolio_country>
-                            <label>Portfiolio country</label>
+                            <label>Portfolio country</label>
                             <comment>Select the country of transaction contract</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>afterpay/sources_portfolioCountry</source_model>
@@ -298,7 +336,7 @@
                             <show_in_store>1</show_in_store>
                         </portfolio_country>
                         <portfolio_type>
-                            <label>Portfiolio type</label>
+                            <label>Portfolio type</label>
                             <comment>Select the type of transaction contract</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>afterpay/sources_portfolioType</source_model>
@@ -310,7 +348,7 @@
                         <portfolio_showbankaccount>
                             <label>Show bankaccount input field</label>
                             <comment>Select Yes to show the bankaccount input field.</comment>
-                            <tooltip>When No is selected the bankaccount number isn’t shown on the front of the shop.</tooltip>
+                            <tooltip>When No is selected the bankaccount number is not shown on the front of the shop.</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>51</sort_order> 
@@ -318,12 +356,56 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </portfolio_showbankaccount>
+                        <portfolio_showgender>
+                            <label>Show gender input field</label>
+                            <comment>Select Yes to show the gender input field.</comment>
+                            <tooltip>When No is selected the gender is not shown on the front of the shop.</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>52</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </portfolio_showgender>
+                        <portfolio_showphonenumber>
+                            <label>Show phone number input field</label>
+                            <comment>Select Yes to show the phone number input field.</comment>
+                            <tooltip>When No is selected the phone number is not shown on the front of the shop.</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>53</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </portfolio_showphonenumber>
+                        <portfolio_showdob>
+                            <label>Show date of birth input field</label>
+                            <comment>Select Yes to show the date of birth input field.</comment>
+                            <tooltip>When No is selected the date of birth is not shown on the front of the shop.</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>54</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </portfolio_showdob>
+                        <portfolio_showterms>
+                            <label>Show terms and conditions checkbox</label>
+                            <comment>Select Yes to show the terms and conditions checkbox.</comment>
+                            <tooltip>When No is selected the AfterPay Terms and Conditions checkbox is not shown on the front of the shop.</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>55</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </portfolio_showterms>
                         <area>
-                            <label>Portfiolio area</label>
+                            <label>Portfolio area</label>
                             <comment>Select where the portfolio will be available</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>afterpay/sources_portfolioArea</source_model>
-                            <sort_order>52</sort_order>
+                            <sort_order>59</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -355,26 +437,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </portfolio_extended_information>
-                        <portfolio_payment_fee>
-                            <label>Portfolio payment fee</label>
-                            <comment>Fee for using this payment method for the customer. Can be both a set amount or a percentage.</comment>
-                            <tooltip>In order to use a set amount, please enter it as a number (i.e. 1.5). In order to use a percentage, please enter a number followed directly by the percentage sign (i.e. 5%).</tooltip>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>80</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </portfolio_payment_fee>
-                        <portfolio_payment_fee_label>
-                            <label>Portfolio payment fee label</label>
-                            <comment>Label that will be shown next to the payment fee.</comment>
-                            <tooltip>This label will be shown in all order overviews where this payment fee is used.</tooltip>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>90</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </portfolio_payment_fee_label>
                         <portfolio_min_amount>
                             <label>Minimal Amount</label>
                             <comment>No value will allow all</comment>
@@ -532,7 +594,7 @@
                     <show_in_store>1</show_in_store>
                     <fields>
                         <active translate="label comment tooltip">
-                            <label>Portfolio B enabled</label>
+                            <label>Portfolio enabled</label>
                             <comment>Select Yes to enable the portfolio.</comment>
                             <tooltip>To use the module it needs to be enabled. When No is selected the module isn’t shown on the front of the shop.</tooltip>
                             <frontend_type>select</frontend_type>
@@ -542,13 +604,63 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </active>
+                        <current_ip_address_for_restriction translate="label comment tooltip">
+                            <label>Your current IP Adresses</label>
+                            <frontend_model>afterpay/adminhtml_ipaddress</frontend_model>
+                            <sort_order>11</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </current_ip_address_for_restriction>
+                        <limit_by_ip translate="label comment tooltip">
+                            <label>Show payment method only for certain IP adresses</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>12</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </limit_by_ip>
+                        <limit_by_ip_ips translate="label comment tooltip">
+                            <label>IP Adresses</label>
+                            <comment>Use comma to seperate IP adresses</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>13</sort_order> 
+                            <depends>
+                                <limit_by_ip>1</limit_by_ip>
+                            </depends>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </limit_by_ip_ips>
+                        <reversed_iprestriction translate="label comment">
+                            <label>Hide payment method only for certain IP adresses</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>14</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </reversed_iprestriction>
+                        <reversed_iprestriction_ips translate="label comment">
+                            <label>IP Adresses</label>
+                            <comment>Use comma to seperate IP adresses</comment>
+                            <frontend_type>text</frontend_type>
+                            <depends>
+                                <reversed_iprestriction>1</reversed_iprestriction>
+                            </depends>
+                            <sort_order>15</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </reversed_iprestriction_ips>
                         <mode translate="label comment tooltip">
                             <label>Mode</label>
                             <comment>Select Live to preform live transactions.</comment>
                             <tooltip>When the base configuration is still in test mode. Live mode of the portfolio is overruled.</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>afterpay/sources_testLive</source_model>
-                            <sort_order>11</sort_order>
+                            <sort_order>17</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -558,7 +670,7 @@
                             <comment>Your user account is provided by AfterPay.</comment>
                             <tooltip>To get an account contact AfterPay.</tooltip>
                             <frontend_type>text</frontend_type>
-                            <sort_order>12</sort_order>
+                            <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -567,27 +679,16 @@
                             <label>Test merchantID</label>
                             <comment>Your user account is provided by AfterPay.</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>13</sort_order>
+                            <sort_order>25</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </test_merchant_id>
-                        <limit_by_ip translate="label comment tooltip">
-                            <label>Client IP restriction</label>
-                            <comment>Use IP client restriction of Magento to show only for selected IP’s</comment>
-                            <tooltip>Magento gives developers the option to enter developers IP. AfterPay uses this list when enabled.</tooltip>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>14</sort_order> 
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </limit_by_ip>
                         <portfolio_id>
-                            <label>Portfiolio ID</label>
+                            <label>Portfolio ID</label>
                             <comment>Afterpay will deliver a portfolio ID</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>15</sort_order>
+                            <sort_order>30</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -596,7 +697,7 @@
                             <label>Live Password</label>
                             <comment>Your Password is provided by AfterPay.</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>16</sort_order>
+                            <sort_order>35</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -605,13 +706,13 @@
                             <label>Test Password</label>
                             <comment>Your Password is provided by AfterPay.</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>17</sort_order>
+                            <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </test_password>
                         <portfolio_country>
-                            <label>Portfiolio country</label>
+                            <label>Portfolio country</label>
                             <comment>Select the country of transaction contract</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>afterpay/sources_portfolioCountry</source_model>
@@ -621,7 +722,7 @@
                             <show_in_store>1</show_in_store>
                         </portfolio_country>
                         <portfolio_type>
-                            <label>Portfiolio type</label>
+                            <label>Portfolio type</label>
                             <comment>Select the type of transaction contract</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>afterpay/sources_portfolioType</source_model>
@@ -633,7 +734,7 @@
                         <portfolio_showbankaccount>
                             <label>Show bankaccount input field</label>
                             <comment>Select Yes to show the bankaccount input field.</comment>
-                            <tooltip>When No is selected the bankaccount number isn’t shown on the front of the shop.</tooltip>
+                            <tooltip>When No is selected the bankaccount number is not shown on the front of the shop.</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>51</sort_order> 
@@ -641,12 +742,56 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </portfolio_showbankaccount>
+                        <portfolio_showgender>
+                            <label>Show gender input field</label>
+                            <comment>Select Yes to show the gender input field.</comment>
+                            <tooltip>When No is selected the gender is not shown on the front of the shop.</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>52</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </portfolio_showgender>
+                        <portfolio_showphonenumber>
+                            <label>Show phone number input field</label>
+                            <comment>Select Yes to show the phone number input field.</comment>
+                            <tooltip>When No is selected the phone number is not shown on the front of the shop.</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>53</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </portfolio_showphonenumber>
+                        <portfolio_showdob>
+                            <label>Show date of birth input field</label>
+                            <comment>Select Yes to show the date of birth input field.</comment>
+                            <tooltip>When No is selected the date of birth is not shown on the front of the shop.</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>54</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </portfolio_showdob>
+                        <portfolio_showterms>
+                            <label>Show terms and conditions checkbox</label>
+                            <comment>Select Yes to show the terms and conditions checkbox.</comment>
+                            <tooltip>When No is selected the AfterPay Terms and Conditions checkbox is not shown on the front of the shop.</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>55</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </portfolio_showterms>
                         <area>
-                            <label>Portfiolio area</label>
+                            <label>Portfolio area</label>
                             <comment>Select where the portfolio will be available</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>afterpay/sources_portfolioArea</source_model>
-                            <sort_order>52</sort_order>
+                            <sort_order>59</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -678,26 +823,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </portfolio_extended_information>
-                        <portfolio_payment_fee>
-                            <label>Portfolio payment fee</label>
-                            <comment>Fee for using this payment method for the customer. Can be both a set amount or a percentage.</comment>
-                            <tooltip>In order to use a set amount, please enter it as a number (i.e. 1.5). In order to use a percentage, please enter a number followed directly by the percentage sign (i.e. 5%).</tooltip>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>80</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </portfolio_payment_fee>
-                        <portfolio_payment_fee_label>
-                            <label>Portfolio payment fee label</label>
-                            <comment>Label that will be shown next to the payment fee.</comment>
-                            <tooltip>This label will be shown in all order overviews where this payment fee is used.</tooltip>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>90</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </portfolio_payment_fee_label>
                         <portfolio_min_amount>
                             <label>Minimal Amount</label>
                             <comment>No value will allow all</comment>
@@ -855,7 +980,7 @@
                     <show_in_store>1</show_in_store>
                     <fields>
                         <active translate="label comment tooltip">
-                            <label>Portfolio C enabled</label>
+                            <label>Portfolio enabled</label>
                             <comment>Select Yes to enable the portfolio.</comment>
                             <tooltip>To use the module it needs to be enabled. When No is selected the module isn’t shown on the front of the shop.</tooltip>
                             <frontend_type>select</frontend_type>
@@ -865,13 +990,63 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </active>
+                        <current_ip_address_for_restriction translate="label comment tooltip">
+                            <label>Your current IP Adresses</label>
+                            <frontend_model>afterpay/adminhtml_ipaddress</frontend_model>
+                            <sort_order>11</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </current_ip_address_for_restriction>
+                        <limit_by_ip translate="label comment tooltip">
+                            <label>Show payment method only for certain IP adresses</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>12</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </limit_by_ip>
+                        <limit_by_ip_ips translate="label comment tooltip">
+                            <label>IP Adresses</label>
+                            <comment>Use comma to seperate IP adresses</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>13</sort_order> 
+                            <depends>
+                                <limit_by_ip>1</limit_by_ip>
+                            </depends>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </limit_by_ip_ips>
+                        <reversed_iprestriction translate="label comment">
+                            <label>Hide payment method only for certain IP adresses</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>14</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </reversed_iprestriction>
+                        <reversed_iprestriction_ips translate="label comment">
+                            <label>IP Adresses</label>
+                            <comment>Use comma to seperate IP adresses</comment>
+                            <frontend_type>text</frontend_type>
+                            <depends>
+                                <reversed_iprestriction>1</reversed_iprestriction>
+                            </depends>
+                            <sort_order>15</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </reversed_iprestriction_ips>
                         <mode translate="label comment tooltip">
                             <label>Mode</label>
                             <comment>Select Live to preform live transactions.</comment>
                             <tooltip>When the base configuration is still in test mode. Live mode of the portfolio is overruled.</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>afterpay/sources_testLive</source_model>
-                            <sort_order>11</sort_order>
+                            <sort_order>17</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -881,7 +1056,7 @@
                             <comment>Your user account is provided by AfterPay.</comment>
                             <tooltip>To get an account contact AfterPay.</tooltip>
                             <frontend_type>text</frontend_type>
-                            <sort_order>12</sort_order>
+                            <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -890,27 +1065,16 @@
                             <label>Test merchantID</label>
                             <comment>Your user account is provided by AfterPay.</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>13</sort_order>
+                            <sort_order>25</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </test_merchant_id>
-                        <limit_by_ip translate="label comment tooltip">
-                            <label>Client IP restriction</label>
-                            <comment>Use IP client restriction of Magento to show only for selected IP’s</comment>
-                            <tooltip>Magento gives developers the option to enter developers IP. AfterPay uses this list when enabled.</tooltip>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>14</sort_order> 
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </limit_by_ip>
                         <portfolio_id>
-                            <label>Portfiolio ID</label>
+                            <label>Portfolio ID</label>
                             <comment>Afterpay will deliver a portfolio ID</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>15</sort_order>
+                            <sort_order>30</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -919,7 +1083,7 @@
                             <label>Live Password</label>
                             <comment>Your Password is provided by AfterPay.</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>16</sort_order>
+                            <sort_order>35</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -928,13 +1092,13 @@
                             <label>Test Password</label>
                             <comment>Your Password is provided by AfterPay.</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>17</sort_order>
+                            <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </test_password>
                         <portfolio_country>
-                            <label>Portfiolio country</label>
+                            <label>Portfolio country</label>
                             <comment>Select the country of transaction contract</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>afterpay/sources_portfolioCountry</source_model>
@@ -944,7 +1108,7 @@
                             <show_in_store>1</show_in_store>
                         </portfolio_country>
                         <portfolio_type>
-                            <label>Portfiolio type</label>
+                            <label>Portfolio type</label>
                             <comment>Select the type of transaction contract</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>afterpay/sources_portfolioType</source_model>
@@ -956,7 +1120,7 @@
                         <portfolio_showbankaccount>
                             <label>Show bankaccount input field</label>
                             <comment>Select Yes to show the bankaccount input field.</comment>
-                            <tooltip>When No is selected the bankaccount number isn’t shown on the front of the shop.</tooltip>
+                            <tooltip>When No is selected the bankaccount number is not shown on the front of the shop.</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>51</sort_order> 
@@ -964,12 +1128,56 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </portfolio_showbankaccount>
+                        <portfolio_showgender>
+                            <label>Show gender input field</label>
+                            <comment>Select Yes to show the gender input field.</comment>
+                            <tooltip>When No is selected the gender is not shown on the front of the shop.</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>52</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </portfolio_showgender>
+                        <portfolio_showphonenumber>
+                            <label>Show phone number input field</label>
+                            <comment>Select Yes to show the phone number input field.</comment>
+                            <tooltip>When No is selected the phone number is not shown on the front of the shop.</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>53</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </portfolio_showphonenumber>
+                        <portfolio_showdob>
+                            <label>Show date of birth input field</label>
+                            <comment>Select Yes to show the date of birth input field.</comment>
+                            <tooltip>When No is selected the date of birth is not shown on the front of the shop.</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>54</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </portfolio_showdob>
+                        <portfolio_showterms>
+                            <label>Show terms and conditions checkbox</label>
+                            <comment>Select Yes to show the terms and conditions checkbox.</comment>
+                            <tooltip>When No is selected the AfterPay Terms and Conditions checkbox is not shown on the front of the shop.</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>55</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </portfolio_showterms>
                         <area>
-                            <label>Portfiolio area</label>
+                            <label>Portfolio area</label>
                             <comment>Select where the portfolio will be available</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>afterpay/sources_portfolioArea</source_model>
-                            <sort_order>52</sort_order>
+                            <sort_order>59</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1001,26 +1209,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </portfolio_extended_information>
-                        <portfolio_payment_fee>
-                            <label>Portfolio payment fee</label>
-                            <comment>Fee for using this payment method for the customer. Can be both a set amount or a percentage.</comment>
-                            <tooltip>In order to use a set amount, please enter it as a number (i.e. 1.5). In order to use a percentage, please enter a number followed directly by the percentage sign (i.e. 5%).</tooltip>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>80</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </portfolio_payment_fee>
-                        <portfolio_payment_fee_label>
-                            <label>Portfolio payment fee label</label>
-                            <comment>Label that will be shown next to the payment fee.</comment>
-                            <tooltip>This label will be shown in all order overviews where this payment fee is used.</tooltip>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>90</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </portfolio_payment_fee_label>
                         <portfolio_min_amount>
                             <label>Minimal Amount</label>
                             <comment>No value will allow all</comment>
@@ -1178,7 +1366,7 @@
                     <show_in_store>1</show_in_store>
                     <fields>
                         <active translate="label comment tooltip">
-                            <label>Portfolio D enabled</label>
+                            <label>Portfolio enabled</label>
                             <comment>Select Yes to enable the portfolio.</comment>
                             <tooltip>To use the module it needs to be enabled. When No is selected the module isn’t shown on the front of the shop.</tooltip>
                             <frontend_type>select</frontend_type>
@@ -1188,13 +1376,63 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </active>
+                        <current_ip_address_for_restriction translate="label comment tooltip">
+                            <label>Your current IP Adresses</label>
+                            <frontend_model>afterpay/adminhtml_ipaddress</frontend_model>
+                            <sort_order>11</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </current_ip_address_for_restriction>
+                        <limit_by_ip translate="label comment tooltip">
+                            <label>Show payment method only for certain IP adresses</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>12</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </limit_by_ip>
+                        <limit_by_ip_ips translate="label comment tooltip">
+                            <label>IP Adresses</label>
+                            <comment>Use comma to seperate IP adresses</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>13</sort_order> 
+                            <depends>
+                                <limit_by_ip>1</limit_by_ip>
+                            </depends>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </limit_by_ip_ips>
+                        <reversed_iprestriction translate="label comment">
+                            <label>Hide payment method only for certain IP adresses</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>14</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </reversed_iprestriction>
+                        <reversed_iprestriction_ips translate="label comment">
+                            <label>IP Adresses</label>
+                            <comment>Use comma to seperate IP adresses</comment>
+                            <frontend_type>text</frontend_type>
+                            <depends>
+                                <reversed_iprestriction>1</reversed_iprestriction>
+                            </depends>
+                            <sort_order>15</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </reversed_iprestriction_ips>
                         <mode translate="label comment tooltip">
                             <label>Mode</label>
                             <comment>Select Live to preform live transactions.</comment>
                             <tooltip>When the base configuration is still in test mode. Live mode of the portfolio is overruled.</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>afterpay/sources_testLive</source_model>
-                            <sort_order>11</sort_order>
+                            <sort_order>17</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1204,7 +1442,7 @@
                             <comment>Your user account is provided by AfterPay.</comment>
                             <tooltip>To get an account contact AfterPay.</tooltip>
                             <frontend_type>text</frontend_type>
-                            <sort_order>12</sort_order>
+                            <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1213,27 +1451,16 @@
                             <label>Test merchantID</label>
                             <comment>Your user account is provided by AfterPay.</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>13</sort_order>
+                            <sort_order>25</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </test_merchant_id>
-                        <limit_by_ip translate="label comment tooltip">
-                            <label>Client IP restriction</label>
-                            <comment>Use IP client restriction of Magento to show only for selected IP’s</comment>
-                            <tooltip>Magento gives developers the option to enter developers IP. AfterPay uses this list when enabled.</tooltip>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>14</sort_order> 
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </limit_by_ip>
                         <portfolio_id>
-                            <label>Portfiolio ID</label>
+                            <label>Portfolio ID</label>
                             <comment>Afterpay will deliver a portfolio ID</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>15</sort_order>
+                            <sort_order>30</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1242,7 +1469,7 @@
                             <label>Live Password</label>
                             <comment>Your Password is provided by AfterPay.</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>16</sort_order>
+                            <sort_order>35</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1251,13 +1478,13 @@
                             <label>Test Password</label>
                             <comment>Your Password is provided by AfterPay.</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>17</sort_order>
+                            <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </test_password>
                         <portfolio_country>
-                            <label>Portfiolio country</label>
+                            <label>Portfolio country</label>
                             <comment>Select the country of transaction contract</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>afterpay/sources_portfolioCountry</source_model>
@@ -1267,7 +1494,7 @@
                             <show_in_store>1</show_in_store>
                         </portfolio_country>
                         <portfolio_type>
-                            <label>Portfiolio type</label>
+                            <label>Portfolio type</label>
                             <comment>Select the type of transaction contract</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>afterpay/sources_portfolioType</source_model>
@@ -1279,7 +1506,7 @@
                         <portfolio_showbankaccount>
                             <label>Show bankaccount input field</label>
                             <comment>Select Yes to show the bankaccount input field.</comment>
-                            <tooltip>When No is selected the bankaccount number isn’t shown on the front of the shop.</tooltip>
+                            <tooltip>When No is selected the bankaccount number is not shown on the front of the shop.</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>51</sort_order> 
@@ -1287,12 +1514,56 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </portfolio_showbankaccount>
+                        <portfolio_showgender>
+                            <label>Show gender input field</label>
+                            <comment>Select Yes to show the gender input field.</comment>
+                            <tooltip>When No is selected the gender is not shown on the front of the shop.</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>52</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </portfolio_showgender>
+                        <portfolio_showphonenumber>
+                            <label>Show phone number input field</label>
+                            <comment>Select Yes to show the phone number input field.</comment>
+                            <tooltip>When No is selected the phone number is not shown on the front of the shop.</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>53</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </portfolio_showphonenumber>
+                        <portfolio_showdob>
+                            <label>Show date of birth input field</label>
+                            <comment>Select Yes to show the date of birth input field.</comment>
+                            <tooltip>When No is selected the date of birth is not shown on the front of the shop.</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>54</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </portfolio_showdob>
+                        <portfolio_showterms>
+                            <label>Show terms and conditions checkbox</label>
+                            <comment>Select Yes to show the terms and conditions checkbox.</comment>
+                            <tooltip>When No is selected the AfterPay Terms and Conditions checkbox is not shown on the front of the shop.</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>55</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </portfolio_showterms>
                         <area>
-                            <label>Portfiolio area</label>
+                            <label>Portfolio area</label>
                             <comment>Select where the portfolio will be available</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>afterpay/sources_portfolioArea</source_model>
-                            <sort_order>52</sort_order>
+                            <sort_order>59</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1324,26 +1595,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </portfolio_extended_information>
-                        <portfolio_payment_fee>
-                            <label>Portfolio payment fee</label>
-                            <comment>Fee for using this payment method for the customer. Can be both a set amount or a percentage.</comment>
-                            <tooltip>In order to use a set amount, please enter it as a number (i.e. 1.5). In order to use a percentage, please enter a number followed directly by the percentage sign (i.e. 5%).</tooltip>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>80</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </portfolio_payment_fee>
-                        <portfolio_payment_fee_label>
-                            <label>Portfolio payment fee label</label>
-                            <comment>Label that will be shown next to the payment fee.</comment>
-                            <tooltip>This label will be shown in all order overviews where this payment fee is used.</tooltip>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>90</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </portfolio_payment_fee_label>
                         <portfolio_min_amount>
                             <label>Minimal Amount</label>
                             <comment>No value will allow all</comment>
@@ -1501,7 +1752,7 @@
                     <show_in_store>1</show_in_store>
                     <fields>
                         <active translate="label comment tooltip">
-                            <label>Portfolio E enabled</label>
+                            <label>Portfolio enabled</label>
                             <comment>Select Yes to enable the portfolio.</comment>
                             <tooltip>To use the module it needs to be enabled. When No is selected the module isn’t shown on the front of the shop.</tooltip>
                             <frontend_type>select</frontend_type>
@@ -1511,13 +1762,63 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </active>
+                        <current_ip_address_for_restriction translate="label comment tooltip">
+                            <label>Your current IP Adresses</label>
+                            <frontend_model>afterpay/adminhtml_ipaddress</frontend_model>
+                            <sort_order>11</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </current_ip_address_for_restriction>
+                        <limit_by_ip translate="label comment tooltip">
+                            <label>Show payment method only for certain IP adresses</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>12</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </limit_by_ip>
+                        <limit_by_ip_ips translate="label comment tooltip">
+                            <label>IP Adresses</label>
+                            <comment>Use comma to seperate IP adresses</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>13</sort_order> 
+                            <depends>
+                                <limit_by_ip>1</limit_by_ip>
+                            </depends>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </limit_by_ip_ips>
+                        <reversed_iprestriction translate="label comment">
+                            <label>Hide payment method only for certain IP adresses</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>14</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </reversed_iprestriction>
+                        <reversed_iprestriction_ips translate="label comment">
+                            <label>IP Adresses</label>
+                            <comment>Use comma to seperate IP adresses</comment>
+                            <frontend_type>text</frontend_type>
+                            <depends>
+                                <reversed_iprestriction>1</reversed_iprestriction>
+                            </depends>
+                            <sort_order>15</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </reversed_iprestriction_ips>
                         <mode translate="label comment tooltip">
                             <label>Mode</label>
                             <comment>Select Live to preform live transactions.</comment>
                             <tooltip>When the base configuration is still in test mode. Live mode of the portfolio is overruled.</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>afterpay/sources_testLive</source_model>
-                            <sort_order>11</sort_order>
+                            <sort_order>17</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1527,7 +1828,7 @@
                             <comment>Your user account is provided by AfterPay.</comment>
                             <tooltip>To get an account contact AfterPay.</tooltip>
                             <frontend_type>text</frontend_type>
-                            <sort_order>12</sort_order>
+                            <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1536,27 +1837,16 @@
                             <label>Test merchantID</label>
                             <comment>Your user account is provided by AfterPay.</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>13</sort_order>
+                            <sort_order>25</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </test_merchant_id>
-                        <limit_by_ip translate="label comment tooltip">
-                            <label>Client IP restriction</label>
-                            <comment>Use IP client restriction of Magento to show only for selected IP’s</comment>
-                            <tooltip>Magento gives developers the option to enter developers IP. AfterPay uses this list when enabled.</tooltip>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>14</sort_order> 
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </limit_by_ip>
                         <portfolio_id>
-                            <label>Portfiolio ID</label>
+                            <label>Portfolio ID</label>
                             <comment>Afterpay will deliver a portfolio ID</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>15</sort_order>
+                            <sort_order>30</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1565,7 +1855,7 @@
                             <label>Live Password</label>
                             <comment>Your Password is provided by AfterPay.</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>16</sort_order>
+                            <sort_order>35</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1574,13 +1864,13 @@
                             <label>Test Password</label>
                             <comment>Your Password is provided by AfterPay.</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>17</sort_order>
+                            <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </test_password>
                         <portfolio_country>
-                            <label>Portfiolio country</label>
+                            <label>Portfolio country</label>
                             <comment>Select the country of transaction contract</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>afterpay/sources_portfolioCountry</source_model>
@@ -1590,7 +1880,7 @@
                             <show_in_store>1</show_in_store>
                         </portfolio_country>
                         <portfolio_type>
-                            <label>Portfiolio type</label>
+                            <label>Portfolio type</label>
                             <comment>Select the type of transaction contract</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>afterpay/sources_portfolioType</source_model>
@@ -1602,7 +1892,7 @@
                         <portfolio_showbankaccount>
                             <label>Show bankaccount input field</label>
                             <comment>Select Yes to show the bankaccount input field.</comment>
-                            <tooltip>When No is selected the bankaccount number isn’t shown on the front of the shop.</tooltip>
+                            <tooltip>When No is selected the bankaccount number is not shown on the front of the shop.</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>51</sort_order> 
@@ -1610,12 +1900,56 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </portfolio_showbankaccount>
+                        <portfolio_showgender>
+                            <label>Show gender input field</label>
+                            <comment>Select Yes to show the gender input field.</comment>
+                            <tooltip>When No is selected the gender is not shown on the front of the shop.</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>52</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </portfolio_showgender>
+                        <portfolio_showphonenumber>
+                            <label>Show phone number input field</label>
+                            <comment>Select Yes to show the phone number input field.</comment>
+                            <tooltip>When No is selected the phone number is not shown on the front of the shop.</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>53</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </portfolio_showphonenumber>
+                        <portfolio_showdob>
+                            <label>Show date of birth input field</label>
+                            <comment>Select Yes to show the date of birth input field.</comment>
+                            <tooltip>When No is selected the date of birth is not shown on the front of the shop.</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>54</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </portfolio_showdob>
+                        <portfolio_showterms>
+                            <label>Show terms and conditions checkbox</label>
+                            <comment>Select Yes to show the terms and conditions checkbox.</comment>
+                            <tooltip>When No is selected the AfterPay Terms and Conditions checkbox is not shown on the front of the shop.</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>55</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </portfolio_showterms>
                         <area>
-                            <label>Portfiolio area</label>
+                            <label>Portfolio area</label>
                             <comment>Select where the portfolio will be available</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>afterpay/sources_portfolioArea</source_model>
-                            <sort_order>52</sort_order>
+                            <sort_order>59</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1647,26 +1981,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </portfolio_extended_information>
-                        <portfolio_payment_fee>
-                            <label>Portfolio payment fee</label>
-                            <comment>Fee for using this payment method for the customer. Can be both a set amount or a percentage.</comment>
-                            <tooltip>In order to use a set amount, please enter it as a number (i.e. 1.5). In order to use a percentage, please enter a number followed directly by the percentage sign (i.e. 5%).</tooltip>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>80</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </portfolio_payment_fee>
-                        <portfolio_payment_fee_label>
-                            <label>Portfolio payment fee label</label>
-                            <comment>Label that will be shown next to the payment fee.</comment>
-                            <tooltip>This label will be shown in all order overviews where this payment fee is used.</tooltip>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>90</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </portfolio_payment_fee_label>
                         <portfolio_min_amount>
                             <label>Minimal Amount</label>
                             <comment>No value will allow all</comment>
@@ -1824,7 +2138,7 @@
                     <show_in_store>1</show_in_store>
                     <fields>
                         <active translate="label comment tooltip">
-                            <label>Portfolio F enabled</label>
+                            <label>Portfolio enabled</label>
                             <comment>Select Yes to enable the portfolio.</comment>
                             <tooltip>To use the module it needs to be enabled. When No is selected the module isn’t shown on the front of the shop.</tooltip>
                             <frontend_type>select</frontend_type>
@@ -1834,13 +2148,63 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </active>
+                        <current_ip_address_for_restriction translate="label comment tooltip">
+                            <label>Your current IP Adresses</label>
+                            <frontend_model>afterpay/adminhtml_ipaddress</frontend_model>
+                            <sort_order>11</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </current_ip_address_for_restriction>
+                        <limit_by_ip translate="label comment tooltip">
+                            <label>Show payment method only for certain IP adresses</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>12</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </limit_by_ip>
+                        <limit_by_ip_ips translate="label comment tooltip">
+                            <label>IP Adresses</label>
+                            <comment>Use comma to seperate IP adresses</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>13</sort_order> 
+                            <depends>
+                                <limit_by_ip>1</limit_by_ip>
+                            </depends>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </limit_by_ip_ips>
+                        <reversed_iprestriction translate="label comment">
+                            <label>Hide payment method only for certain IP adresses</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>14</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </reversed_iprestriction>
+                        <reversed_iprestriction_ips translate="label comment">
+                            <label>IP Adresses</label>
+                            <comment>Use comma to seperate IP adresses</comment>
+                            <frontend_type>text</frontend_type>
+                            <depends>
+                                <reversed_iprestriction>1</reversed_iprestriction>
+                            </depends>
+                            <sort_order>15</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </reversed_iprestriction_ips>
                         <mode translate="label comment tooltip">
                             <label>Mode</label>
                             <comment>Select Live to preform live transactions.</comment>
                             <tooltip>When the base configuration is still in test mode. Live mode of the portfolio is overruled.</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>afterpay/sources_testLive</source_model>
-                            <sort_order>11</sort_order>
+                            <sort_order>17</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1850,7 +2214,7 @@
                             <comment>Your user account is provided by AfterPay.</comment>
                             <tooltip>To get an account contact AfterPay.</tooltip>
                             <frontend_type>text</frontend_type>
-                            <sort_order>12</sort_order>
+                            <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1859,27 +2223,16 @@
                             <label>Test merchantID</label>
                             <comment>Your user account is provided by AfterPay.</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>13</sort_order>
+                            <sort_order>25</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </test_merchant_id>
-                        <limit_by_ip translate="label comment tooltip">
-                            <label>Client IP restriction</label>
-                            <comment>Use IP client restriction of Magento to show only for selected IP’s</comment>
-                            <tooltip>Magento gives developers the option to enter developers IP. AfterPay uses this list when enabled.</tooltip>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>14</sort_order> 
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </limit_by_ip>
                         <portfolio_id>
-                            <label>Portfiolio ID</label>
+                            <label>Portfolio ID</label>
                             <comment>Afterpay will deliver a portfolio ID</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>15</sort_order>
+                            <sort_order>30</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1888,7 +2241,7 @@
                             <label>Live Password</label>
                             <comment>Your Password is provided by AfterPay.</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>16</sort_order>
+                            <sort_order>35</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1897,13 +2250,13 @@
                             <label>Test Password</label>
                             <comment>Your Password is provided by AfterPay.</comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>17</sort_order>
+                            <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </test_password>
                         <portfolio_country>
-                            <label>Portfiolio country</label>
+                            <label>Portfolio country</label>
                             <comment>Select the country of transaction contract</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>afterpay/sources_portfolioCountry</source_model>
@@ -1913,7 +2266,7 @@
                             <show_in_store>1</show_in_store>
                         </portfolio_country>
                         <portfolio_type>
-                            <label>Portfiolio type</label>
+                            <label>Portfolio type</label>
                             <comment>Select the type of transaction contract</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>afterpay/sources_portfolioType</source_model>
@@ -1925,7 +2278,7 @@
                         <portfolio_showbankaccount>
                             <label>Show bankaccount input field</label>
                             <comment>Select Yes to show the bankaccount input field.</comment>
-                            <tooltip>When No is selected the bankaccount number isn’t shown on the front of the shop.</tooltip>
+                            <tooltip>When No is selected the bankaccount number is not shown on the front of the shop.</tooltip>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>51</sort_order> 
@@ -1933,12 +2286,56 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </portfolio_showbankaccount>
+                        <portfolio_showgender>
+                            <label>Show gender input field</label>
+                            <comment>Select Yes to show the gender input field.</comment>
+                            <tooltip>When No is selected the gender is not shown on the front of the shop.</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>52</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </portfolio_showgender>
+                        <portfolio_showphonenumber>
+                            <label>Show phone number input field</label>
+                            <comment>Select Yes to show the phone number input field.</comment>
+                            <tooltip>When No is selected the phone number is not shown on the front of the shop.</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>53</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </portfolio_showphonenumber>
+                        <portfolio_showdob>
+                            <label>Show date of birth input field</label>
+                            <comment>Select Yes to show the date of birth input field.</comment>
+                            <tooltip>When No is selected the date of birth is not shown on the front of the shop.</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>54</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </portfolio_showdob>
+                        <portfolio_showterms>
+                            <label>Show terms and conditions checkbox</label>
+                            <comment>Select Yes to show the terms and conditions checkbox.</comment>
+                            <tooltip>When No is selected the AfterPay Terms and Conditions checkbox is not shown on the front of the shop.</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>55</sort_order> 
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </portfolio_showterms>
                         <area>
-                            <label>Portfiolio area</label>
+                            <label>Portfolio area</label>
                             <comment>Select where the portfolio will be available</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>afterpay/sources_portfolioArea</source_model>
-                            <sort_order>52</sort_order>
+                            <sort_order>59</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -1970,26 +2367,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </portfolio_extended_information>
-                        <portfolio_payment_fee>
-                            <label>Portfolio payment fee</label>
-                            <comment>Fee for using this payment method for the customer. Can be both a set amount or a percentage.</comment>
-                            <tooltip>In order to use a set amount, please enter it as a number (i.e. 1.5). In order to use a percentage, please enter a number followed directly by the percentage sign (i.e. 5%).</tooltip>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>80</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </portfolio_payment_fee>
-                        <portfolio_payment_fee_label>
-                            <label>Portfolio payment fee label</label>
-                            <comment>Label that will be shown next to the payment fee.</comment>
-                            <tooltip>This label will be shown in all order overviews where this payment fee is used.</tooltip>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>90</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </portfolio_payment_fee_label>
                         <portfolio_min_amount>
                             <label>Minimal Amount</label>
                             <comment>No value will allow all</comment>
@@ -2156,19 +2533,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </capture_mode>
-                        <capture_delay_days>
-                            <label>Capture delay</label>
-                            <comment>in days.</comment>
-                            <tooltip>Select the amount of days AfterPay will wait after capturing the order, before the invoice is sent to the customer.</tooltip>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>110</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <depends>
-                                <capture_mode>1</capture_mode>
-                            </depends>
-                        </capture_delay_days>
                         <order_status_accepted translate="label">
                             <label>Status Capture Request Accepted</label>
                             <tooltip>For administrative purposes a new status can be created connected to processing.</tooltip>
@@ -2178,9 +2542,6 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <depends>
-                                <capture_mode>1</capture_mode>
-                            </depends>
                         </order_status_accepted>
                         <order_status_refused translate="label">
                             <label>Status Capture Request Refused</label>
@@ -2191,9 +2552,6 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <depends>
-                                <capture_mode>1</capture_mode>
-                            </depends>
                         </order_status_refused>
                     </fields>
                 </afterpay_capture>
@@ -2218,21 +2576,5 @@
                 </afterpay_refund>
             </groups>
         </afterpay>
-        <sales>
-            <groups>
-                <totals_sort>
-                    <fields>
-                        <paymentFee module="afterpay" translate="label">
-                            <label>Afterpay Servicekosten</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>90</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </paymentFee>
-                    </fields>
-                </totals_sort>
-            </groups>
-        </sales>
     </sections>
 </config>

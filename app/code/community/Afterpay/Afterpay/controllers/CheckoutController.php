@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011-2015  arvato Finance B.V.
+ * Copyright (c) 2011-2017  arvato Finance B.V.
  *
  * AfterPay reserves all rights in the Program as delivered. The Program
  * or any portion thereof may not be reproduced in any form whatsoever without
@@ -18,7 +18,7 @@
  *
  * @category    AfterPay
  * @package     Afterpay_Afterpay
- * @copyright   Copyright (c) 2011-2015 arvato Finance B.V.
+ * @copyright   Copyright (c) 2011-2017 arvato Finance B.V.
  */
  
  class Afterpay_Afterpay_CheckoutController extends Mage_Core_Controller_Front_Action
@@ -27,7 +27,7 @@
     {
         try {
             $request = Mage::getModel('afterpay/request_abstract');
-            $response  = $request->sendRequest();
+            $response = $request->sendRequest();
         } catch (Exception $exception) {
             $response = false;
             Mage::getSingleton('core/session')->addError(
@@ -35,16 +35,23 @@
             );
         }
         
-        
         if (is_array($response)) {
-            if($response['redirect'] === true) {
+            if(isset($response['redirect']) && $response['redirect'] === true) {
                 $this->_redirectUrl($response['redirecturl']);
             } else {
                 if ($response['response'] === true) {
                     $successRedirectConfig = Mage::getStoreConfig('afterpay/afterpay_general/success_redirect', Mage::app()->getStore()->getId());
                     $redirectUrl = $successRedirectConfig ? $successRedirectConfig : 'checkout/onepage/success';
                 } else {
-                    $failureRedirectConfig = Mage::getStoreConfig('afterpay/afterpay_general/failure_redirect', Mage::app()->getStore()->getId());
+                    switch ($response['error']) {
+                        case 'rejection': 
+                            $failureRedirectConfig = Mage::getStoreConfig('afterpay/afterpay_general/failure_redirect', Mage::app()->getStore()->getId());
+                            break;
+                        case 'validation':
+                            $failureRedirectConfig = Mage::getStoreConfig('afterpay/afterpay_general/validation_redirect', Mage::app()->getStore()->getId());
+                            break;
+                    }
+                    
                     $redirectUrl = $failureRedirectConfig ? $failureRedirectConfig : 'checkout/onepage/';
                 }
                 

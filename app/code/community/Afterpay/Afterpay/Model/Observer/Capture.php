@@ -1,6 +1,6 @@
 <?php 
 /**
- * Copyright (c) 2011-2015  arvato Finance B.V.
+ * Copyright (c) 2011-2017  arvato Finance B.V.
  *
  * AfterPay reserves all rights in the Program as delivered. The Program
  * or any portion thereof may not be reproduced in any form whatsoever without
@@ -18,7 +18,7 @@
  *
  * @category    AfterPay
  * @package     Afterpay_Afterpay
- * @copyright   Copyright (c) 2011-2015 arvato Finance B.V.
+ * @copyright   Copyright (c) 2011-2017 arvato Finance B.V.
  */
  
 class Afterpay_Afterpay_Model_Observer_Capture extends Mage_Core_Model_Abstract
@@ -26,17 +26,22 @@ class Afterpay_Afterpay_Model_Observer_Capture extends Mage_Core_Model_Abstract
     public function sales_order_invoice_register(Varien_Event_Observer $observer)
     {
         //to prevent the script from running twice
-        if (Mage::registry('captureStarted')) {
-            Mage::unregister('captureStarted');
+        if (Mage::registry('AfterpayCaptureStarted')) {
+            Mage::unregister('AfterpayCaptureStarted');
             return $this;
         }
         
-        return $this->_capture($observer->getOrder(), $observer->getInvoice());
+        // Only do capture on invoice register when capture mode is not manual
+        if (Mage::getStoreConfig('afterpay/afterpay_capture/capture_mode', Mage::app()->getStore()->getId()) != '1') {
+            return $this->_capture($observer->getOrder(), $observer->getInvoice());
+        } else {
+            return $this;
+        }
     }
     
     public function sales_order_payment_capture(Varien_Event_Observer $observer)
     {
-        Mage::register('captureStarted', 1);
+        Mage::register('AfterpayCaptureStarted', 1);
         
         return $this->_capture($observer->getInvoice()->getOrder(), $observer->getInvoice());
     }
@@ -49,6 +54,79 @@ class Afterpay_Afterpay_Model_Observer_Capture extends Mage_Core_Model_Abstract
             $invoice->setTransactionId($invoice->getOrder()->getAfterpayOrderReference());
         }
         
+        return $this;
+    }
+    
+    public function sales_order_shipment_save_after(Varien_Event_Observer $observer)
+    {
+        $shipment = $observer->getEvent()->getShipment();
+        $order = $shipment->getOrder();
+        
+        try {
+            
+            if (Mage::getStoreConfig('afterpay/afterpay_general/auto_invoice', $order->getStoreId()) !== 'yes-shipping') {
+                return false;
+            }
+
+            Mage::log('sales_order_shipment_save_after called', null, 'Afterpay_Observer.log', true);
+
+            
+            if($order->canInvoice())
+            {   
+                $invoice = Mage::getModel('sales/service_order', $order)->prepareInvoice();
+                $invoice->setRequestedCaptureCase(Mage_Sales_Model_Order_Invoice::CAPTURE_ONLINE);
+                $invoice->register();
+                $transactionSave = Mage::getModel('core/resource_transaction')
+                    ->addObject($invoice)
+                    ->addObject($invoice->getOrder());
+                $transactionSave->save();
+            }
+        } catch (Exception $e) {
+            $order->addStatusHistoryComment(
+                'AfterPay: Cannot auto create invoice based on shipping. Exception message: '.
+                $e->getMessage(), false);
+            $order->save();
+        }
+    }
+    
+    public function sales_order_save_after(Varien_Event_Observer $observer)
+    {
+        $order = $observer->getEvent()->getOrder();
+
+        if (Mage::getStoreConfig('afterpay/afterpay_general/auto_invoice', $order->getStoreId()) !== 'yes-status') {
+            return false;
+        }
+        
+        try {
+            
+            Mage::log('sales_order_save_after called', null, 'Afterpay_Observer.log', true);
+    
+            $changeOnStatus = Mage::getStoreConfig('afterpay/afterpay_general/auto_invoice_status', $order->getStoreId());
+            $currentStatus = $order->getStatus();
+            $originalStatus = $order->getOrigData('status');
+    
+            Mage::log('Change on status: ' . $changeOnStatus, null, 'Afterpay_Observer.log', true);
+            Mage::log('Current status: ' . $currentStatus, null, 'Afterpay_Observer.log', true);
+            Mage::log('Original status: ' . $originalStatus, null, 'Afterpay_Observer.log', true);
+    
+            if ($currentStatus == $changeOnStatus && $originalStatus != $changeOnStatus) {
+                if($order->canInvoice())
+                {
+                    $invoice = Mage::getModel('sales/service_order', $order)->prepareInvoice();
+                    $invoice->setRequestedCaptureCase(Mage_Sales_Model_Order_Invoice::CAPTURE_ONLINE);
+                    $invoice->register();
+                    $transactionSave = Mage::getModel('core/resource_transaction')
+                        ->addObject($invoice)
+                        ->addObject($invoice->getOrder());
+                    $transactionSave->save();
+                }
+            }
+        } catch (Exception $e) {
+            $order->addStatusHistoryComment(
+                'AfterPay: Cannot auto create invoice based on status. Exception message: '.
+                $e->getMessage(), false);
+            $order->save();
+        }
         return $this;
     }
     
@@ -66,7 +144,6 @@ class Afterpay_Afterpay_Model_Observer_Capture extends Mage_Core_Model_Abstract
             
             $result = $captureRequest->sendCaptureRequest();
         } catch (Exception $exception) {
-            mage::helper('afterpay')->resetPaymentFeeInvoicedValues($order, $invoice);
             $invoice->cancel()->save();
             
             Mage::getSingleton('adminhtml/session')->addError($exception->getMessage());
@@ -74,7 +151,6 @@ class Afterpay_Afterpay_Model_Observer_Capture extends Mage_Core_Model_Abstract
         }
         
         if ($result === false) {
-            mage::helper('afterpay')->resetPaymentFeeInvoicedValues($order, $invoice);
             $invoice->cancel()->save();
             
             Mage::throwException('Unable to capture this invoice');
@@ -91,7 +167,7 @@ class Afterpay_Afterpay_Model_Observer_Capture extends Mage_Core_Model_Abstract
             return false;
         }
         
-        if (Mage::getStoreConfig('afterpay/afterpay_capture/capture_mode', Mage::app()->getStore()->getId()) != '1') {
+        if (Mage::getStoreConfig('afterpay/afterpay_capture/capture_mode', Mage::app()->getStore()->getId()) === '0') {
             return false;
         }
         
@@ -99,11 +175,6 @@ class Afterpay_Afterpay_Model_Observer_Capture extends Mage_Core_Model_Abstract
             $invoice->getBaseGrandTotal() - $order->getBaseGrandTotal() > 0.01 
             || $invoice->getBaseGrandTotal() - $order->getBaseGrandTotal() < -0.01
         ) {
-            // Compatability Fix for TIG Buckaroo and PostNL
-            if($invoice->getBaseGrandTotal - ($order->getBaseGrandTotal() + ($invoice->getPaymentFee() + $invoice->getPaymentFeeTax()) > 1)) {
-                return true;
-            }
-            
             Mage::throwException('Can only capture full invoices. Partial invoices cannot be captured by AfterPay.');
             return false;
         }

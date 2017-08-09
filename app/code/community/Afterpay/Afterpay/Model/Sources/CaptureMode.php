@@ -1,6 +1,6 @@
 <?php 
 /**
- * Copyright (c) 2011-2015  arvato Finance B.V.
+ * Copyright (c) 2011-2017  arvato Finance B.V.
  *
  * AfterPay reserves all rights in the Program as delivered. The Program
  * or any portion thereof may not be reproduced in any form whatsoever without
@@ -18,7 +18,7 @@
  *
  * @category    AfterPay
  * @package     Afterpay_Afterpay
- * @copyright   Copyright (c) 2011-2015 arvato Finance B.V.
+ * @copyright   Copyright (c) 2011-2017 arvato Finance B.V.
  */
  
  class Afterpay_Afterpay_Model_Sources_CaptureMode extends Varien_Object
@@ -28,7 +28,7 @@
         $array = array(
              array('value' => '0', 'label' => Mage::helper('afterpay')->__('Disabled')),
              array('value' => '1', 'label' => Mage::helper('afterpay')->__('Manual')),
-             array('value' => '2', 'label' => Mage::helper('afterpay')->__('Automatic')),
+             array('value' => '2', 'label' => Mage::helper('afterpay')->__('Automatic'))
         );
         return $array;
     }

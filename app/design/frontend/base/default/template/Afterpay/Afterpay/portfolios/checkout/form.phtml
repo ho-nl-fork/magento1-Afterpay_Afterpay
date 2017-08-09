@@ -19,6 +19,7 @@
                 </div>
             </div>
             <?php else: ?>
+            <?php if ($this->showGender()): ?>
             <div class="field">
                 <label for="<?php echo $_code; ?>_gender" class = "required"><em>*</em><?php echo $_helper->__('Gender:'); ?></label>
                 <div class="input-box" id="">
@@ -29,11 +30,13 @@
                 </div>
             </div>
             <?php endif; ?>
+            <?php endif; ?>
         <?php if ($isEnterprise): ?>
             </li>
             <li>
         <?php endif;?>
         <?php if (!$this->isB2B()): ?>
+            <?php if ($this->showDob()): ?>
             <div class="field">
                 <?php 
                 echo $this->getLayout()->createBlock('afterpay/customer_widget_dob')
@@ -45,6 +48,7 @@
                 ?>
              </div>
             </li>
+            <?php endif; ?>
             <?php if ($this->showBankaccount()): ?>
             <li> 
                 <div class="field">
@@ -64,12 +68,6 @@
                         <input type="text" value="<?php echo $this->getCompany(); ?>" class="required-entry" id="<?php echo $_code; ?>_companyname" name="payment[<?php echo $_code; ?>][companyname]">
                     </div>
                 </div>
-                <div class="field">
-                    <label for="<?php echo $_code; ?>_department" class=""><?php echo $_helper->__('Department:'); ?></label>
-                    <div class="input-box">
-                        <input type="text" class = "" id="<?php echo $_code; ?>_department" name="payment[<?php echo $_code; ?>][department]">
-                    </div>
-                </div>
             </li>
             <li>
                 <div class="field">
@@ -78,26 +76,23 @@
                         <input type="text" class = "required-entry" id="<?php echo $_code; ?>_coc" name="payment[<?php echo $_code; ?>][coc]">
                     </div>
                 </div>
-                <div class="field">
-                    <label for="<?php echo $_code; ?>_vat" class="required"><em>*</em><?php echo $_helper->__('Vatnumber:'); ?></label>
-                    <div class="input-box">
-                        <input type="text" class = "required-entry" id="<?php echo $_code; ?>_vat" name="payment[<?php echo $_code; ?>][vat]">
-                    </div>
-                </div>
             </li>
-            <li>
-                <div class="field">
-                    <label for="<?php echo $_code; ?>_costcenter"><?php echo $_helper->__('Costcenter'); ?></label>
-                    <div class="input-box">
-                        <input type="text" id="<?php echo $_code; ?>_costcenter" name="payment[<?php echo $_code; ?>][costcenter]">
-                    </div>
+        <?php endif; ?>
+        <?php if ($this->showPhonenumber()): ?>
+        <li> 
+            <div class="field">
+                <label for="<?php echo $_code; ?>_phonenumber" class="required"><em>*</em><?php echo $_helper->__('Phone number'); ?>:</label>
+                <div class="input-box">
+                    <input type="text" class = "required-entry" id="<?php echo $_code; ?>_phonenumber" name="payment[<?php echo $_code; ?>][phonenumber]">
                 </div>
-            </li> 
+            </div>
+        </li>
         <?php endif; ?>
         <?php if (!$this->isAdvisoryprocess() && $this->country != 'dede'): ?>
+        <?php if ($this->showTerms()): ?>
         <li>
-            <input type="checkbox" class="required-entry" id="<?php echo $_code; ?>_termsAndConditions" name="payment[<?php echo $_code; ?>][conditions]"  style="float:left;">
-            <label for="<?php echo $_code; ?>_termsAndConditions" class="required" style="padding-left:5px; float:left;">
+            <input type="checkbox" class="checkbox required-entry" id="<?php echo $_code; ?>_termsAndConditions" name="payment[<?php echo $_code; ?>][conditions]">
+            <label for="<?php echo $_code; ?>_termsAndConditions" class="required">
                 <em>*</em>
                 <?php echo $_helper->__(
                     'Ik ga akkoord met de %sbetalingsvoorwaarden%s van AfterPay',
@@ -106,10 +101,11 @@
                 );?>
             </label>
         </li>
+        <?php endif; ?>
         <?php elseif ($this->isAdvisoryprocess() && $this->country != 'dede'): ?>
         <li>
-            <input type="checkbox" class="required-entry" id="<?php echo $_code; ?>_termsAndConditions" name="payment[<?php echo $_code; ?>][conditions]"  style="float:left;">
-            <label for="<?php echo $_code; ?>_termsAndConditions" class="required" style="padding-left:5px; float:left;">
+            <input type="checkbox" class="checkbox required-entry" id="<?php echo $_code; ?>_termsAndConditions" name="payment[<?php echo $_code; ?>][conditions]">
+            <label for="<?php echo $_code; ?>_termsAndConditions" class="required">
                 <em>*</em>
                 <?php echo $_helper->__(
                     'Ik ga akkoord met de %sbetalingsvoorwaarden%s van Mijnbetaalplan',

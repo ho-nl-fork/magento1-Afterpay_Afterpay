@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011-2015  arvato Finance B.V.
+ * Copyright (c) 2011-2017  arvato Finance B.V.
  *
  * AfterPay reserves all rights in the Program as delivered. The Program
  * or any portion thereof may not be reproduced in any form whatsoever without
@@ -18,7 +18,7 @@
  *
  * @category    AfterPay
  * @package     Afterpay_Afterpay
- * @copyright   Copyright (c) 2011-2015 arvato Finance B.V.
+ * @copyright   Copyright (c) 2011-2017 arvato Finance B.V.
  */
  
  class Afterpay_Afterpay_Model_Response_Abstract extends Afterpay_Afterpay_Model_Abstract
@@ -178,7 +178,7 @@
                     $this->_order->sendNewOrderEmail();
                 }
             } else {
-                if (version_compare($magentoVersion, '1.9.1', '>=')){
+                if (version_compare($magentoVersion, '1.13.1', '>=')){
                     $this->_order->queueNewOrderEmail();
                 } else {
                     $this->_order->sendNewOrderEmail();
@@ -255,7 +255,7 @@
         $this->restoreQuote();
         $this->_debugEmail .= "The quote has been restored. \n";
 
-        return false;
+        return array('response'=>false, 'error'=>'rejection');
     }
     
     protected function _error()
@@ -309,13 +309,6 @@
     {
         $this->_debugEmail .= "The response indicates a validation error. \n";
 
-        //Mage::getBlockSingleton('core/messages')->setEscapeMessageFlag(false);
-        Mage::getSingleton('core/session')->addError(
-            $this->_helper->__(
-                'One or more fields you have entered appear to be incorrect. Please check all values entered and try again.'
-            )
-        );
-        
         if(!is_array($this->_response->return->failures))
         {
             $failures[] = $this->_response->return->failures;
@@ -323,12 +316,9 @@
         }
         
         foreach($this->_response->return->failures as $failure) {
-            if (isset($failure->suggestedvalue) && !empty($failure->suggestedvalue)) {
-                $validationSuggestion = ucfirst($failure->suggestedvalue);          
-                Mage::getSingleton('core/session')->addError(
-                    $this->_helper->__($validationSuggestion)
-                );
-            }
+            Mage::getSingleton('core/session')->addError(
+                $this->_helper->__(Mage::helper('afterpay')->checkValidationError( $failure ) )
+            );
             $this->_debugEmail .= 'Failure: ' . var_export($failure, true) . "\n";
         }
         
@@ -337,7 +327,7 @@
         $this->restoreQuote();
         $this->_debugEmail .= "The quote has been restored. \n";
         
-        return false;
+        return array('response'=>false, 'error'=>'validation');
     }
 
     protected function _verifyError()
@@ -424,14 +414,29 @@
         try {
             $payment = $this->_order->getPayment();
             $this->_debugEmail .= "Attempting to capture order.\n";
-            if (Mage::getStoreConfig('afterpay/afterpay_general/auto_invoice', $this->_order->getStoreId())) {
-                $payment->registerCaptureNotification($this->_order->getBaseGrandTotal());
-                $this->_order->setTotalPaid($this->_order->getBaseGrandTotal());
-                $this->_order->setStatus(Mage::getStoreConfig('afterpay/afterpay_' . $this->_order->getPayment()->getMethod() . '/order_status_accepted', $this->_order->getStoreId()))->save();
+            if (Mage::getStoreConfig('afterpay/afterpay_general/auto_invoice', $this->_order->getStoreId()) === 'yes') {
+                
+                // Check if capture mode is manual, if so only create the invoice
+                if (Mage::getStoreConfig('afterpay/afterpay_capture/capture_mode', Mage::app()->getStore()->getId()) == '1') {
+                    $invoice = Mage::getModel('sales/service_order', $this->_order)->prepareInvoice();
+                    $invoice->register();
+                } else {
+                    $payment->registerCaptureNotification($this->_order->getBaseGrandTotal());
+                    $this->_order->setTotalPaid($this->_order->getBaseGrandTotal());
+                    $this->_order->setStatus(Mage::getStoreConfig('afterpay/afterpay_' . $this->_order->getPayment()->getMethod() . '/order_status_accepted', $this->_order->getStoreId()))->save();
+                }
+                
+                if(Mage::getStoreConfig('afterpay/afterpay_general/send_invoice', Mage::app()->getStore()->getId()) == '1') {
+                    $invoice = $this->_order->getInvoiceCollection()->getLastItem();
+                    $invoice->sendEmail();
+                    $invoice->setEmailSent(true);
+                    $invoice->save();
+                }
             }
         } catch (Exception $exception) {
             $this->_debugEmail .= 'capture has failed. Reason: ' . $exception->getMessage() . "\n";
             $this->_order->addStatusHistoryComment($exception->getMessage());
+            $this->_order->setStatus(Mage::getStoreConfig('afterpay/afterpay_capture/order_status_refused', $this->_order->getStoreId()));
             $this->_order->save();
         }
         

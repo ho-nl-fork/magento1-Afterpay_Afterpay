@@ -1,4 +1,4 @@
-<?php
+<?php 
 /**
  * Copyright (c) 2011-2017  arvato Finance B.V.
  *
@@ -21,7 +21,16 @@
  * @copyright   Copyright (c) 2011-2017 arvato Finance B.V.
  */
  
- class Afterpay_Afterpay_Model_Resource_Setup extends Mage_Eav_Model_Entity_Setup
+ class Afterpay_Afterpay_Model_Sources_AutoinvoiceMode extends Varien_Object
 {
-    
+    public function toOptionArray()
+    {
+        $array = array(
+             array('value' => 'yes', 'label' => Mage::helper('afterpay')->__('Yes, direct')),
+             array('value' => 'yes-shipping', 'label' => Mage::helper('afterpay')->__('Yes, at shipping')),
+             array('value' => 'yes-status', 'label' => Mage::helper('afterpay')->__('Yes, at selected status')),
+             array('value' => 'no', 'label' => Mage::helper('afterpay')->__('No')),
+        );
+        return $array;
+    }
 }

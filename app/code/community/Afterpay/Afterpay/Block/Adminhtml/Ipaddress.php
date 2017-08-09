@@ -21,16 +21,25 @@
  * @copyright   Copyright (c) 2011-2017 arvato Finance B.V.
  */
 
-class Afterpay_Afterpay_Block_Adminhtml_Version extends Mage_Adminhtml_Block_System_Config_Form_Fieldset
+class Afterpay_Afterpay_Block_Adminhtml_Ipaddress extends Mage_Adminhtml_Block_System_Config_Form_Fieldset
 {
     protected $_fieldRenderer;
 
     public function render(Varien_Data_Form_Element_Abstract $element)
     {
+        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+            $ip = $_SERVER['HTTP_CLIENT_IP'];
+        } else if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+            $ip = trim($ips[count($ips) - 1]); //real IP address behind proxy IP
+        } else {
+            $ip = $_SERVER['REMOTE_ADDR']; //no proxy found
+        }
+        
         $html = '
-            <tr>
+            <tr id="' . $element->getId() .'" >
                 <td class="label"><label for="'.$element->getHtmlId().'">'.$element->getLabel().'</label></td>
-                <td class="value" id="version_info">'.Mage::getConfig()->getNode('modules/Afterpay_Afterpay')->version.'</td>
+                <td class="value" id="'.$element->getHtmlId().'">'.$ip.'</td>
             </tr>
         ';
 

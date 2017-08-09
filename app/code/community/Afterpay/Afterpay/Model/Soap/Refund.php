@@ -1,6 +1,6 @@
 <?php 
 /**
- * Copyright (c) 2011-2015  arvato Finance B.V.
+ * Copyright (c) 2011-2017  arvato Finance B.V.
  *
  * AfterPay reserves all rights in the Program as delivered. The Program
  * or any portion thereof may not be reproduced in any form whatsoever without
@@ -18,7 +18,7 @@
  *
  * @category    AfterPay
  * @package     Afterpay_Afterpay
- * @copyright   Copyright (c) 2011-2015 arvato Finance B.V.
+ * @copyright   Copyright (c) 2011-2017 arvato Finance B.V.
  */
  
  class Afterpay_Afterpay_Model_Soap_Refund extends Afterpay_Afterpay_Model_Soap_Abstract
@@ -81,7 +81,7 @@
             
             $invoiceLine = Mage::getModel('afterpay/soap_parameters_orderLine');
             
-            $invoiceLine->articleDescription = $line['articleDescription'];
+            $invoiceLine->articleDescription = preg_replace("/[^a-zA-Z0-9\_\-\s]/i", "", $line['articleDescription']);
             $invoiceLine->articleId          = $line['articleId'];
             $invoiceLine->quantity           = $line['quantity'];
             $invoiceLine->unitprice          = $line['unitPrice'];

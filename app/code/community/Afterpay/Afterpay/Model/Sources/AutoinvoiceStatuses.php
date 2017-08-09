@@ -21,7 +21,21 @@
  * @copyright   Copyright (c) 2011-2017 arvato Finance B.V.
  */
  
- class Afterpay_Afterpay_Model_Resource_Setup extends Mage_Eav_Model_Entity_Setup
+class Afterpay_Afterpay_Model_Sources_AutoinvoiceStatuses extends Varien_Object
 {
-    
+
+    static public function toOptionArray()
+    {
+        $statuses = Mage::getSingleton('sales/order_config')->getStatuses();
+         
+        $options = array();
+        foreach($statuses as $value => $label)
+        {
+            $options[] = array(
+                'value' => $value, 'label' => $label
+            );
+        }
+        
+        return $options;
+    }
 }

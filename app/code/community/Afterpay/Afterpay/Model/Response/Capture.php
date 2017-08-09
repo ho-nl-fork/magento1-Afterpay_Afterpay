@@ -1,6 +1,6 @@
 <?php 
 /**
- * Copyright (c) 2011-2015  arvato Finance B.V.
+ * Copyright (c) 2011-2017  arvato Finance B.V.
  *
  * AfterPay reserves all rights in the Program as delivered. The Program
  * or any portion thereof may not be reproduced in any form whatsoever without
@@ -18,7 +18,7 @@
  *
  * @category    AfterPay
  * @package     Afterpay_Afterpay
- * @copyright   Copyright (c) 2011-2015 arvato Finance B.V.
+ * @copyright   Copyright (c) 2011-2017 arvato Finance B.V.
  */
  
  class Afterpay_Afterpay_Model_Response_Capture extends Afterpay_Afterpay_Model_Response_Abstract
@@ -183,7 +183,7 @@
         $this->_order->setStatus(Mage::getStoreConfig('afterpay/afterpay_capture/order_status_refused', $this->_order->getStoreId()))
                      ->save();
 
-        Mage::getSingleton('adminhtml/session')->addError($this->_helper->__('A technical error occurred whilst trying to capture this invoice'));
+        Mage::getSingleton('adminhtml/session')->addError($this->_helper->__('A technical error occurred while trying to capture this invoice'));
         
         return false;
     }

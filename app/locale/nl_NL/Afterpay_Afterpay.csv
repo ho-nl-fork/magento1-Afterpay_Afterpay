@@ -18,7 +18,7 @@
 "Failure URL","Weigerings URL"
 "The page a customer is redirected to when an order is denied. Leave blank for default magento.","De pagina waar een klant naar doorgestuurd wordt nadat de bestelling geweigerd is door AfterPay. Laat leeg om gebruik te maken van de standaard Magento URL."
 "Auto-Invoice","Automatische facturatie"
-"Select Yes to automatically invoice orders when they are accepted by AfterPay","Activeer deze opties om geaccepteerde orders automatisch te laten factureren."
+"Select Yes to automatically invoice orders in Magento when they are accepted by AfterPay","Activeer deze optie om facturen automatisch in Magento aan te maken zodra de order door AfterPay is geaccepteerd."
 "Select if you want extra information to debug.","Selecteer of u extra informatie verlangt om te debuggen."
 "For multiple emails separate them using a comma.","Voor meer dan één e-mail adres kunt u deze scheiden met een komma."
 
@@ -63,11 +63,11 @@
 
 "Select Yes to enable the portfolio.","Selecteer Ja om deze portefeuille te activeren."
 "When the base configuration is still in test mode. Live mode of the portfolio is overruled.","Wanneer de algemene instellingen op test modus staan zal de portefeuille ook in test modus zijn."
-"Portfiolio ID","Portefeuille ID"
+"Portfolio ID","Portefeuille ID"
 "Afterpay will deliver a portfolio ID","Het portefeuille ID wordt door AfterPay aangeleverd."
-"Portfiolio type","Portefeuille type"
+"Portfolio type","Portefeuille type"
 "Select the type of transaction contract","Selecteer het type transactie overeenkomst."
-"Portfiolio area","Portefeuille gebied"
+"Portfolio area","Portefeuille gebied"
 "Select where the portfolio will be available","Selecteer of de portefeuille beschikbaar is in de frontend of de backend van de shop of beide."
 "Live Password","Live wachtwoord"
 "Your Password is provided by AfterPay.","Uw wachtwoord wordt aangeleverd door AfterPay."
@@ -171,9 +171,7 @@
 "YYYY","JJJJ"
 "Bank account number:","Bankrekening nummer:"
 "Company name:","Bedrijfsnaam:"
-"Department:","Afdeling:"
 "Coc number:","KvK nummer:"
-"Vatnumber:","BTW nummer:"
 
 "Refund AfterPay Fee","Terug te betalen servicekosten"
 "Looking for Afterpay payment methods? We have our own tab to the left under Sales.","Op zoek naar AfterPay betaalmethodes? Wij hebben onze eigen tab links onder verkoop."
@@ -249,9 +247,63 @@
 "Show bankaccount input field", "Bankrekeningnummer veld weergeven"
 "Select Yes to show the bankaccount input field.", "Selecteer Ja om het veld bankrekeningnummer weer te geven."
 
-"Portfiolio country", "Portefeuille land"
+"Portfolio country", "Portefeuille land"
 "Select the country of transaction contract", "Selecteer het land waarvoor de transactie moet plaatsvinden"
 
 "Netherlands", "Nederland"
 "Belgium", "Belgie"
 "Germany", "Duitsland"
+
+"Yes, direct", "Ja, direct"
+"Yes, at selected status", "Ja, op geselecteerde status"
+"Yes, at shipping", "Ja, bij verzending"
+
+"Auto invoice status", "Automatische facturatie bij status"
+"Select status on which the invoice must be created", "Selecteer de status waarop de factuur moet worden aangemaakt"
+
+"Push Password (only for Belgium)", "Push wachtwoord (alleen voor Belgie)"
+"Your push password is provided by AfterPay.", "Het push wachtwoord wat u van AfterPay heeft ontvangen."
+
+"Yes", "Ja"
+"No", "Nee"
+
+"Status Accepted No Invoice", "Status geaccepteerde order, maar nog geen factuur"
+"New is the default state for a new order without invoice.", "Nieuw is de standaard status voor een order zonder factuur"
+
+"Select Yes to enable advisory process.", "Selecteer Ja om het adviesproces te activeren"
+
+"Separate Discount", "Korting als orderregel doorgeven"
+"Select Yes to sent the discount as separate order line to AfterPay", "Selecteer Ja om de korting als orderregel door te geven, bij Nee wordt de korting op de orderregels van de producten verrekend."
+
+"Phone number", "Telefoonnummer"
+"Show gender input field", "Geslacht weergeven"
+"Select Yes to show the gender input field.", "Selecteer Ja om het geslacht veld weer te geven bij de AfterPay betaalmethode. Bij Nee wordt er gekeken naar het standaard geslacht veld van Magento. Let op: Geslacht is een verplichte waarde voor AfterPay."
+
+"Show phone number input field", "Telefoonnummer weergeven"
+"Select Yes to show the phone number input field.", "Selecteer Ja om het telefoonnummer veld weer te geven bij de AfterPay betaalmethode. Bij Nee wordt er gekeken naar het standaard telefoonnummer veld van Magento. Let op: Telefoonnummer is een verplichte waarde voor AfterPay."
+
+"Show date of birth input field", "Geboortedatum weergeven"
+"Select Yes to show the date of birth input field.", "Selecteer Ja om het geboortedatum veld weer te geven bij de AfterPay betaalmethode. Bij Nee wordt er gekeken naar het standaard geboortedatum veld van Magento. Let op: Geboortedatum is een verplichte waarde voor AfterPay."
+
+"Show terms and conditions checkbox", "Algemene voorwaarden veld weergeven"
+"Select Yes to show the terms and conditions checkbox.", "Selecteer Ja om het algemene voorwaarden veld weer te geven bij de AfterPay betaalmethode. Let op: Consumenten moeten akkoord gaan met de algemene voorwaarden van AfterPay. Dit kan ook door de voorwaarden met een link op te nemen in uw eigen algemene voorwaarden."
+
+"Validation URL", "URL verwijzen na validatiefout"
+"The page a customer is redirected to when an order is denied by validation error. Leave blank for default magento.", "Vul hier de pagina in waarnaar de consument moet worden verwezen nadat een validatiefout is opgetreden. Laat het leeg om de standaard van Magento te gebruiken"
+
+"Disabled", "Uitgeschakeld"
+"Automatic", "Automatisch"
+"Manual", "Handmatig"
+
+"Send Invoice Mail", "Verstuur factuur email"
+"Select Yes to send Magento Invoice mail", "Selecteer Ja om de Magento Factuur te versturen"
+
+"The date of birth is missing invalid. Please check your date or birth or contact our customer service.","De geboortedatum mist of is ongeldig. Controleer uw geboortedatum of neem contact op met onze klantenservice"
+
+"Show payment method only for certain IP adresses","Betaalmethode tonen op basis van IP adres"
+"Hide payment method only for certain IP adresses","Betaalmethode verbergen op basis van IP adres"
+"IP Adresses","IP Adressen"
+"Use comma to seperate IP adresses","Gebruik een comma om IP adressen te scheiden"
+"Your current IP Adresses","Uw huidige IP adres"
+
+"Refund to store credits or reward points is not possible, using AfterPay online refund. First do an offline refund for the desired amount to credit / award points. Then do an online AfterPay refund for the remaining amount, if applicable.","Een creditering naar winkeltegoed of spaarpunten is niet mogelijk i.c.m. een AfterPay (online) terugbetaling. Doe eerst een handmatige (offline) terugbetaling voor het bedrag dat u wilt terugboeken naar winkeltegoed / spaarpunten. Indien nodig, doe daarna een (online) terugboeking voor het resterende bedrag."

@@ -1,6 +1,6 @@
 <?php 
 /**
- * Copyright (c) 2011-2015  arvato Finance B.V.
+ * Copyright (c) 2011-2017  arvato Finance B.V.
  *
  * AfterPay reserves all rights in the Program as delivered. The Program
  * or any portion thereof may not be reproduced in any form whatsoever without
@@ -18,7 +18,7 @@
  *
  * @category    AfterPay
  * @package     Afterpay_Afterpay
- * @copyright   Copyright (c) 2011-2015 arvato Finance B.V.
+ * @copyright   Copyright (c) 2011-2017 arvato Finance B.V.
  */
  
  class Afterpay_Afterpay_Model_Soap_Authorize extends Afterpay_Afterpay_Model_Soap_Abstract
@@ -262,7 +262,7 @@
             
             $orderLine = Mage::getModel('afterpay/soap_parameters_orderLine');
             
-            $orderLine->articleDescription = $line['articleDescription'];
+            $orderLine->articleDescription = preg_replace("/[^a-zA-Z0-9\_\-\s]/i", "", $line['articleDescription']);
             $orderLine->articleId          = $line['articleId'];
             $orderLine->quantity           = $line['quantity'];
             $orderLine->unitprice          = $line['unitPrice'];
@@ -284,8 +284,8 @@
         
         $company->cocnumber   = $this->_vars['company']['cocNumber'];
         $company->companyname = $this->_vars['company']['companyName'];
-        $company->department  = $this->_vars['company']['department'];
-        $company->vatnumber   = $this->_vars['company']['vatNumber'];
+        $company->department  = '';
+        $company->vatnumber   = '';
         
         $company = $this->_cleanEmptyValues($company);
         

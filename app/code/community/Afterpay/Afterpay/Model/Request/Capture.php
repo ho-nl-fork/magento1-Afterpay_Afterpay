@@ -1,6 +1,6 @@
 <?php 
 /**
- * Copyright (c) 2011-2015  arvato Finance B.V.
+ * Copyright (c) 2011-2017  arvato Finance B.V.
  *
  * AfterPay reserves all rights in the Program as delivered. The Program
  * or any portion thereof may not be reproduced in any form whatsoever without
@@ -18,7 +18,7 @@
  *
  * @category    AfterPay
  * @package     Afterpay_Afterpay
- * @copyright   Copyright (c) 2011-2015 arvato Finance B.V.
+ * @copyright   Copyright (c) 2011-2017 arvato Finance B.V.
  */
  
  class Afterpay_Afterpay_Model_Request_Capture extends Afterpay_Afterpay_Model_Request_Abstract
@@ -139,16 +139,12 @@
     protected function _addCaptureVariables()
     {
         $this->_invoice->save();
-        
-        $captureDelayDays = Mage::getStoreConfig('aftrpay/afterpay_capture/capture_delay_days', $this->_order->getStoreId());
-        if (empty($captureDelayDays)) {
-            $captureDelayDays = 0;
-        }
-        
+        $this->_invoice->load();
+
         $shippingMethod =$this->_order->getShippingDescription();
         
         $array = array(
-            'captureDelay'        => $captureDelayDays,
+            'captureDelay'        => 0,
             'invoiceId'           => $this->_invoice->getIncrementId(),
             'shippingMethodTitle' => $shippingMethod,
         );
